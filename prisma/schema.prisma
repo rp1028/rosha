@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// 회차 (ex: 2026년 3회차 입시평가회)
+model Session {
+  id           String        @id @default(uuid())
+  title        String        // "2026년 3회차 입시평가회"
+  description  String?
+  date         DateTime
+  status       SessionStatus @default(RECRUITING)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  applications Application[]
+  criteria     EvaluationCriteria[]
+}
+
+enum SessionStatus {
+  RECRUITING
+  IN_PROGRESS
+  COMPLETED
+}
+
+// 학생 (동일인 판별: name + phone)
+model Student {
+  id           String        @id @default(uuid())
+  name         String
+  phone        String
+  email        String
+  school       String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  applications Application[]
+
+  @@unique([name, phone])
+}
+
+// 신청 (학생 + 회차)
+model Application {
+  id          String       @id @default(uuid())
+  uniqueCode  String       @unique // 고유번호 (학생 로그인 ID)
+  password    String       // bcrypt 해시
+  desiredUniv String       // 희망 대학교
+  studentId   String
+  sessionId   String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  student     Student      @relation(fields: [studentId], references: [id])
+  session     Session      @relation(fields: [sessionId], references: [id])
+  evaluations Evaluation[]
+  videos      Video[]
+
+  @@unique([studentId, sessionId])
+}
+
+// 평가자 (선생님 / 관리자)
+model Evaluator {
+  id          String       @id @default(uuid())
+  name        String
+  loginId     String       @unique
+  password    String
+  role        EvalRole     @default(EVALUATOR)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  evaluations Evaluation[]
+}
+
+enum EvalRole {
+  ADMIN
+  EVALUATOR
+}
+
+// 평가 항목 (회차별 설정 가능: 음정, 리듬, 표현력 등)
+model EvaluationCriteria {
+  id        String   @id @default(uuid())
+  sessionId String
+  name      String   // ex: "음정", "리듬", "표현력"
+  maxScore  Int      @default(10)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  session Session           @relation(fields: [sessionId], references: [id])
+  scores  EvaluationScore[]
+
+  @@unique([sessionId, name])
+}
+
+// 평가 (여러 선생님이 각각 평가)
+model Evaluation {
+  id            String      @id @default(uuid())
+  applicationId String
+  evaluatorId   String
+  comment       String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  application   Application       @relation(fields: [applicationId], references: [id])
+  evaluator     Evaluator         @relation(fields: [evaluatorId], references: [id])
+  scores        EvaluationScore[]
+
+  @@unique([applicationId, evaluatorId])
+}
+
+// 세부 항목별 점수
+model EvaluationScore {
+  id           String @id @default(uuid())
+  evaluationId String
+  criteriaId   String
+  score        Int
+
+  evaluation Evaluation         @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  criteria   EvaluationCriteria @relation(fields: [criteriaId], references: [id])
+
+  @@unique([evaluationId, criteriaId])
+}
+
+// 연주 영상 (유튜브)
+model Video {
+  id            String      @id @default(uuid())
+  applicationId String
+  youtubeUrl    String
+  title         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  application   Application @relation(fields: [applicationId], references: [id])
+}
