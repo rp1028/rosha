@@ -6,6 +6,13 @@ const secret = new TextEncoder().encode(
   process.env.JWT_SECRET || "fallback-secret-change-me"
 );
 
+// 관리자(ADMIN)만 접근 가능한 경로
+const adminOnlyPaths = [
+  "/admin/evaluators",
+  "/admin/sessions",
+  "/admin/videos",
+];
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("token")?.value;
@@ -37,6 +44,16 @@ export async function middleware(request: NextRequest) {
       const { payload } = await jwtVerify(token, secret);
       if (payload.role !== "admin" && payload.role !== "evaluator") {
         return NextResponse.redirect(new URL("/admin/login", request.url));
+      }
+
+      // 관리자 전용 페이지 접근 제한
+      const isAdminOnlyPath = adminOnlyPaths.some((path) =>
+        pathname.startsWith(path)
+      );
+      if (isAdminOnlyPath && payload.role !== "admin") {
+        return NextResponse.redirect(
+          new URL("/admin/dashboard", request.url)
+        );
       }
     } catch {
       return NextResponse.redirect(new URL("/admin/login", request.url));

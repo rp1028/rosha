@@ -260,31 +260,47 @@ export default function EvaluatePage() {
               <div className="flex flex-col gap-3">
                 <p className="text-sm font-medium">세부 항목 점수</p>
                 {(criteria || []).map((c) => (
-                  <div key={c.id}>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-sm">{c.name}</label>
-                      <span className="text-xs text-gray-400">
-                        / {c.maxScore}점
-                      </span>
-                    </div>
-                    <input
-                      type="range"
-                      min={0}
-                      max={c.maxScore}
-                      value={scores[c.id] || 0}
-                      onChange={(e) =>
-                        setScores({
-                          ...scores,
-                          [c.id]: parseInt(e.target.value),
-                        })
-                      }
-                      className="w-full"
-                    />
-                    <div className="text-right text-sm font-bold">
-                      {scores[c.id] || 0}점
-                    </div>
-                  </div>
-                ))}
+  <div key={c.id}>
+    <div className="flex items-center justify-between mb-1">
+      <label className="text-sm">{c.name}</label>
+      <span className="text-xs text-gray-400">
+        / {c.maxScore}점
+      </span>
+    </div>
+    <div className="flex items-center gap-3">
+      <input
+        type="range"
+        min={0}
+        max={c.maxScore}
+        value={scores[c.id] || 0}
+        onChange={(e) =>
+          setScores({
+            ...scores,
+            [c.id]: parseInt(e.target.value),
+          })
+        }
+        className="flex-1"
+      />
+      <div className="flex items-center gap-1">
+        <input
+          type="number"
+          min={0}
+          max={c.maxScore}
+          value={scores[c.id] ?? 0}
+          onChange={(e) => {
+            let val = parseInt(e.target.value);
+            if (isNaN(val)) val = 0;
+            if (val < 0) val = 0;
+            if (val > c.maxScore) val = c.maxScore;
+            setScores({ ...scores, [c.id]: val });
+          }}
+          className="w-16 border rounded px-2 py-1 text-center text-sm font-bold"
+        />
+        <span className="text-sm text-gray-500">점</span>
+      </div>
+    </div>
+  </div>
+))}
 
                 <div className="border-t pt-3">
                   <div className="flex items-center justify-between mb-3">
