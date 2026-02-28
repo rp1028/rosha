@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       // 기존 학생: 정보 업데이트
       student = await prisma.student.update({
         where: { id: student.id },
-        data: { name, school },
+        data: { name, school, email },
       });
     } else {
       // 신규 학생 생성

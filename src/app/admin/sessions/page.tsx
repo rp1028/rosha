@@ -78,7 +78,6 @@ export default function SessionsPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 빈 항목명 체크
     const validCriteria = criteriaList.filter((c) => c.name.trim());
     if (validCriteria.length === 0) {
       alert("평가 항목을 최소 1개 이상 추가해주세요.");
@@ -119,6 +118,31 @@ export default function SessionsPage() {
       body: JSON.stringify({ status }),
     });
     fetchSessions();
+  };
+
+  const handleDelete = async (session: Session) => {
+    const appCount = session._count.applications;
+    const message = appCount > 0
+      ? `"${session.title}"에 ${appCount}명의 신청 데이터가 있습니다.\n관련된 모든 데이터(신청, 평가, 영상)가 함께 삭제됩니다.\n\n정말 삭제하시겠습니까?`
+      : `"${session.title}"을(를) 삭제하시겠습니까?`;
+
+    if (!confirm(message)) return;
+
+    try {
+      const res = await fetch(`/api/sessions/${session.id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "삭제에 실패했습니다.");
+        return;
+      }
+
+      fetchSessions();
+    } catch {
+      alert("삭제에 실패했습니다.");
+    }
   };
 
   const totalMaxScore = criteriaList.reduce((sum, c) => sum + c.maxScore, 0);
@@ -180,7 +204,7 @@ export default function SessionsPage() {
               onChange={(e) =>
                 setForm({ ...form, description: e.target.value })
               }
-              placeholder="설명을 입력하세요"
+              placeholder="회차에 대한 간단한 설명"
               className="w-full border rounded-lg px-3 py-2"
             />
           </div>
@@ -188,8 +212,8 @@ export default function SessionsPage() {
           {/* 평가 항목 */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium">
-                평가 항목 (합계: {totalMaxScore}점)
+              <label className="block text-sm font-medium">
+                평가 항목 (총 {totalMaxScore}점)
               </label>
               <button
                 type="button"
@@ -199,34 +223,33 @@ export default function SessionsPage() {
                 + 항목 추가
               </button>
             </div>
-
             <div className="flex flex-col gap-2">
               {criteriaList.map((c, i) => (
-                <div key={i} className="flex items-center gap-2">
+                <div key={i} className="flex gap-2 items-center">
                   <input
                     type="text"
                     value={c.name}
-                    onChange={(e) => updateCriteria(i, "name", e.target.value)}
+                    onChange={(e) =>
+                      updateCriteria(i, "name", e.target.value)
+                    }
                     placeholder="항목명"
-                    className="flex-1 border rounded-lg px-3 py-2 text-sm"
+                    className="flex-1 border rounded-lg px-3 py-1.5 text-sm"
                   />
-                  <div className="flex items-center gap-1">
-                    <input
-                      type="number"
-                      value={c.maxScore}
-                      onChange={(e) =>
-                        updateCriteria(i, "maxScore", e.target.value)
-                      }
-                      min={1}
-                      className="w-16 border rounded-lg px-2 py-2 text-sm text-center"
-                    />
-                    <span className="text-xs text-gray-500">점</span>
-                  </div>
+                  <input
+                    type="number"
+                    value={c.maxScore}
+                    onChange={(e) =>
+                      updateCriteria(i, "maxScore", e.target.value)
+                    }
+                    min={1}
+                    className="w-20 border rounded-lg px-3 py-1.5 text-sm text-center"
+                  />
+                  <span className="text-xs text-gray-400">점</span>
                   {criteriaList.length > 1 && (
                     <button
                       type="button"
                       onClick={() => removeCriteria(i)}
-                      className="text-red-400 hover:text-red-600 text-sm px-1"
+                      className="text-red-400 hover:text-red-600 text-sm"
                     >
                       ✕
                     </button>
@@ -251,17 +274,6 @@ export default function SessionsPage() {
           <div key={session.id} className="border rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <h2 className="font-medium">{session.title}</h2>
-              <span
-                className={`text-xs px-2 py-1 rounded ${
-                  session.status === "RECRUITING"
-                    ? "bg-green-100 text-green-700"
-                    : session.status === "IN_PROGRESS"
-                    ? "bg-yellow-100 text-yellow-700"
-                    : "bg-gray-100 text-gray-600"
-                }`}
-              >
-                {STATUS_LABEL[session.status]}
-              </span>
             </div>
             <p className="text-sm text-gray-500 mb-2">
               {new Date(session.date).toLocaleDateString("ko-KR")} ·{" "}
@@ -297,33 +309,34 @@ export default function SessionsPage() {
               </div>
             )}
 
-            <div className="flex gap-2">
-              {session.status !== "RECRUITING" && (
-                <button
-                  onClick={() => handleStatusChange(session.id, "RECRUITING")}
-                  className="text-xs border px-2 py-1 rounded hover:bg-gray-50"
-                >
-                  모집중
-                </button>
-              )}
-              {session.status !== "IN_PROGRESS" && (
-                <button
-                  onClick={() =>
-                    handleStatusChange(session.id, "IN_PROGRESS")
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-500">상태:</label>
+                <select
+                  value={session.status}
+                  onChange={(e) =>
+                    handleStatusChange(session.id, e.target.value)
                   }
-                  className="text-xs border px-2 py-1 rounded hover:bg-gray-50"
+                  className={`text-xs border rounded px-2 py-1 ${
+                    session.status === "RECRUITING"
+                      ? "text-green-700 bg-green-50"
+                      : session.status === "IN_PROGRESS"
+                      ? "text-yellow-700 bg-yellow-50"
+                      : "text-gray-600 bg-gray-50"
+                  }`}
                 >
-                  진행중
-                </button>
-              )}
-              {session.status !== "COMPLETED" && (
-                <button
-                  onClick={() => handleStatusChange(session.id, "COMPLETED")}
-                  className="text-xs border px-2 py-1 rounded hover:bg-gray-50"
-                >
-                  완료
-                </button>
-              )}
+                  <option value="RECRUITING">모집중</option>
+                  <option value="IN_PROGRESS">진행중</option>
+                  <option value="COMPLETED">완료</option>
+                </select>
+              </div>
+
+              <button
+                onClick={() => handleDelete(session)}
+                className="text-xs text-red-500 hover:text-red-700 transition"
+              >
+                삭제
+              </button>
             </div>
           </div>
         ))}

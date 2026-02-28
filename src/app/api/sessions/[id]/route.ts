@@ -50,7 +50,7 @@ export async function PATCH(
   }
 }
 
-// DELETE: 회차 삭제
+// DELETE: 회차 삭제 (연관 데이터 모두 삭제)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -62,7 +62,46 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    await prisma.session.delete({ where: { id } });
+
+    // 트랜잭션으로 연관 데이터 모두 삭제
+    await prisma.$transaction(async (tx) => {
+      // 1. 해당 회차의 신청 ID 목록
+      const applications = await tx.application.findMany({
+        where: { sessionId: id },
+        select: { id: true },
+      });
+      const appIds = applications.map((a) => a.id);
+
+      if (appIds.length > 0) {
+        // 2. 평가 점수 삭제
+        await tx.evaluationScore.deleteMany({
+          where: { evaluation: { applicationId: { in: appIds } } },
+        });
+
+        // 3. 평가 삭제
+        await tx.evaluation.deleteMany({
+          where: { applicationId: { in: appIds } },
+        });
+
+        // 4. 영상 삭제
+        await tx.video.deleteMany({
+          where: { applicationId: { in: appIds } },
+        });
+
+        // 5. 신청 삭제
+        await tx.application.deleteMany({
+          where: { sessionId: id },
+        });
+      }
+
+      // 6. 평가 항목 삭제
+      await tx.evaluationCriteria.deleteMany({
+        where: { sessionId: id },
+      });
+
+      // 7. 회차 삭제
+      await tx.session.delete({ where: { id } });
+    });
 
     return apiSuccess({ message: "삭제되었습니다." });
   } catch {
