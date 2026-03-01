@@ -25,12 +25,12 @@ export async function POST(request: Request) {
 
     if (!application) return apiError("신청을 찾을 수 없습니다.", 404);
 
-    // 새 비밀번호 생성 및 업데이트
+    // 새 비밀번호 생성 및 Student에 업데이트
     const newPassword = generatePassword();
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    await prisma.application.update({
-      where: { id: applicationId },
+    await prisma.student.update({
+      where: { id: application.student.id },
       data: { password: hashedPassword },
     });
 
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     const emailContent = buildCredentialEmail({
       name: application.student.name,
       sessionTitle: application.session.title,
-      uniqueCode: application.uniqueCode,
+      uniqueCode: application.student.uniqueCode,
       password: newPassword,
     });
 

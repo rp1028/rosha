@@ -13,28 +13,24 @@ export async function POST(request: Request) {
       return apiError("고유번호와 비밀번호를 입력해주세요.");
     }
 
-    const application = await prisma.application.findUnique({
+    // Student에서 직접 조회
+    const student = await prisma.student.findUnique({
       where: { uniqueCode },
-      include: {
-        student: true,
-        session: true,
-      },
     });
 
-    if (!application) {
+    if (!student) {
       return apiError("고유번호 또는 비밀번호가 올바르지 않습니다.", 401);
     }
 
-    const isValid = await bcrypt.compare(password, application.password);
+    const isValid = await bcrypt.compare(password, student.password);
     if (!isValid) {
       return apiError("고유번호 또는 비밀번호가 올바르지 않습니다.", 401);
     }
 
-    // JWT 토큰 발급
+    // JWT 토큰 발급 (studentId 기반)
     const token = await signToken({
-      id: application.id,
+      id: student.id,
       role: "student",
-      sessionId: application.sessionId,
     });
 
     const cookieStore = await cookies();
@@ -42,16 +38,14 @@ export async function POST(request: Request) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24, // 24시간
+      maxAge: 60 * 60 * 24,
       path: "/",
     });
 
     return apiSuccess({
       message: "로그인 성공",
       student: {
-        name: application.student.name,
-        sessionTitle: application.session.title,
-        applicationId: application.id,
+        name: student.name,
       },
     });
   } catch {

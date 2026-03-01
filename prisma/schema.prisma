@@ -32,6 +32,8 @@ model Student {
   phone        String
   email        String
   school       String
+  uniqueCode   String        @unique  // 고유번호 (로그인 ID) - 최초 신청 시 발급
+  password     String        // bcrypt 해시
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   applications Application[]
@@ -42,8 +44,6 @@ model Student {
 // 신청 (학생 + 회차)
 model Application {
   id          String       @id @default(uuid())
-  uniqueCode  String       @unique // 고유번호 (학생 로그인 ID)
-  password    String       // bcrypt 해시
   desiredUniv String       // 희망 대학교
   studentId   String
   sessionId   String
@@ -99,34 +99,33 @@ model Evaluation {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
-  application   Application       @relation(fields: [applicationId], references: [id])
-  evaluator     Evaluator         @relation(fields: [evaluatorId], references: [id])
+  application   Application      @relation(fields: [applicationId], references: [id])
+  evaluator     Evaluator        @relation(fields: [evaluatorId], references: [id])
   scores        EvaluationScore[]
 
   @@unique([applicationId, evaluatorId])
 }
 
-// 세부 항목별 점수
+// 세부 평가 점수 (항목별)
 model EvaluationScore {
-  id           String @id @default(uuid())
+  id           String   @id @default(uuid())
   evaluationId String
   criteriaId   String
   score        Int
 
-  evaluation Evaluation         @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  evaluation Evaluation         @relation(fields: [evaluationId], references: [id])
   criteria   EvaluationCriteria @relation(fields: [criteriaId], references: [id])
 
   @@unique([evaluationId, criteriaId])
 }
 
-// 연주 영상 (유튜브)
+// 연주 영상
 model Video {
-  id            String      @id @default(uuid())
+  id            String   @id @default(uuid())
   applicationId String
   youtubeUrl    String
   title         String?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  createdAt     DateTime @default(now())
 
-  application   Application @relation(fields: [applicationId], references: [id])
+  application Application @relation(fields: [applicationId], references: [id])
 }

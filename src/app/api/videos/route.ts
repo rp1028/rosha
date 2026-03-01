@@ -8,23 +8,34 @@ export async function GET(request: Request) {
     const auth = await getSession();
     if (!auth) return apiError("로그인이 필요합니다.", 401);
 
+    const { searchParams } = new URL(request.url);
+
     // 학생: 자기 영상만
     if (auth.role === "student") {
+      const applicationId = searchParams.get("applicationId");
+
       const videos = await prisma.video.findMany({
-        where: { applicationId: auth.id },
+        where: {
+          application: {
+            studentId: auth.id,
+            ...(applicationId ? { id: applicationId } : {}),
+          },
+        },
+        include: {
+          application: {
+            include: { session: { select: { title: true } } },
+          },
+        },
         orderBy: { createdAt: "desc" },
       });
       return apiSuccess(videos);
     }
 
     // 관리자: 회차별 전체
-    const { searchParams } = new URL(request.url);
     const sessionId = searchParams.get("sessionId");
 
     const videos = await prisma.video.findMany({
-      where: sessionId
-        ? { application: { sessionId } }
-        : {},
+      where: sessionId ? { application: { sessionId } } : {},
       include: {
         application: {
           include: { student: true, session: true },

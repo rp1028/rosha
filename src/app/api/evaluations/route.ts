@@ -12,13 +12,23 @@ export async function GET(request: Request) {
 
     // 학생: 자기 평가만 조회
     if (auth.role === "student") {
+      const applicationId = searchParams.get("applicationId");
+
       const evaluations = await prisma.evaluation.findMany({
-        where: { applicationId: auth.id },
+        where: {
+          application: {
+            studentId: auth.id,
+            ...(applicationId ? { id: applicationId } : {}),
+          },
+        },
         include: {
           evaluator: { select: { name: true } },
           scores: {
             include: { criteria: true },
             orderBy: { criteria: { order: "asc" } },
+          },
+          application: {
+            include: { session: { select: { title: true } } },
           },
         },
         orderBy: { createdAt: "desc" },
@@ -55,19 +65,15 @@ export async function GET(request: Request) {
 }
 
 // POST: 평가 생성/수정
-// Body: { applicationId, scores: [{ criteriaId, score }], comment }
 export async function POST(request: Request) {
   try {
     const auth = await getSession();
-    console.log("AUTH:", JSON.stringify(auth));
-    
+
     if (!auth || (auth.role !== "admin" && auth.role !== "evaluator")) {
       return apiError("권한이 없습니다.", 401);
     }
 
     const body = await request.json();
-    console.log("BODY:", JSON.stringify(body));
-    
     const { applicationId, scores, comment } = body;
     if (!applicationId || !scores || !Array.isArray(scores)) {
       return apiError("신청 ID와 점수 데이터가 필요합니다.");
@@ -84,7 +90,7 @@ export async function POST(request: Request) {
     });
 
     if (existing) {
-      // 기존 평가 업데이트: 점수 삭제 후 재생성
+      // 기존 평가 업데이트
       const evaluation = await prisma.evaluation.update({
         where: { id: existing.id },
         data: {

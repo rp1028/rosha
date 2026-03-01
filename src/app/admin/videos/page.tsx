@@ -12,8 +12,7 @@ type Session = {
 
 type Application = {
   id: string;
-  uniqueCode: string;
-  student: { name: string };
+  student: { name: string; uniqueCode: string };
 };
 
 type Video = {
@@ -49,11 +48,9 @@ export default function VideosPage() {
 
   useEffect(() => {
     if (!selectedSession) return;
-    // 학생 목록
     fetch(`/api/admin/students?sessionId=${selectedSession}`)
       .then((r) => r.json())
       .then(setApplications);
-    // 영상 목록
     fetch(`/api/videos?sessionId=${selectedSession}`)
       .then((r) => r.json())
       .then(setVideos);
@@ -74,7 +71,6 @@ export default function VideosPage() {
       if (res.ok) {
         setMessage("영상이 등록되었습니다.");
         setForm({ applicationId: "", youtubeUrl: "", title: "" });
-        // 새로고침
         const updated = await fetch(
           `/api/videos?sessionId=${selectedSession}`
         ).then((r) => r.json());
@@ -97,7 +93,6 @@ export default function VideosPage() {
         <h1 className="text-2xl font-bold">영상 관리</h1>
       </div>
 
-      {/* 회차 선택 */}
       <div className="mb-6">
         <label className="block text-sm font-medium mb-1">회차 선택</label>
         <select
@@ -116,7 +111,6 @@ export default function VideosPage() {
 
       {selectedSession && (
         <>
-          {/* 영상 등록 폼 */}
           <form
             onSubmit={handleSubmit}
             className="border rounded-lg p-4 mb-6 flex flex-col gap-3"
@@ -134,7 +128,7 @@ export default function VideosPage() {
               <option value="">학생 선택</option>
               {applications.map((app) => (
                 <option key={app.id} value={app.id}>
-                  {app.student.name} ({app.uniqueCode})
+                  {app.student.name} ({app.student.uniqueCode})
                 </option>
               ))}
             </select>
@@ -177,7 +171,6 @@ export default function VideosPage() {
             </button>
           </form>
 
-          {/* 등록된 영상 목록 */}
           <h2 className="font-medium mb-3">
             등록된 영상 ({videos.length}건)
           </h2>

@@ -19,7 +19,13 @@ export async function GET(request: Request) {
       include: {
         student: true,
         evaluations: {
-          include: { evaluator: { select: { name: true } } },
+          include: {
+            evaluator: { select: { name: true } },
+            scores: {
+              include: { criteria: true },
+              orderBy: { criteria: { order: "asc" } },
+            },
+          },
         },
       },
       orderBy: { createdAt: "asc" },
