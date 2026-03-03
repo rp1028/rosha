@@ -168,6 +168,16 @@ export default function EvaluateStudentPage({
     return (evaluation.scores || []).reduce((sum, s) => sum + s.score, 0);
   };
 
+  const isPdfSheet = (url?: string | null) => {
+    if (!url) return false;
+    try {
+      const lower = url.toLowerCase();
+      return lower.endsWith(".pdf");
+    } catch {
+      return false;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -213,7 +223,57 @@ export default function EvaluateStudentPage({
         </div>
 
         <div className="flex flex-col gap-6 lg:flex-row">
-          {/* 왼쪽: 평가 영역 */}
+          {/* 왼쪽: 악보 영역 */}
+          <aside className="lg:w-[480px] xl:w-[560px]">
+            <section className="rounded-xl border border-neutral-200 bg-white px-4 py-4 text-sm shadow-sm">
+              <h2 className="text-sm font-medium text-neutral-900">
+                악보 보기
+              </h2>
+              <p className="mt-1 text-xs text-neutral-500">
+                관리자 페이지 &quot;악보 관리&quot;에서 학생별 악보 링크를
+                설정할 수 있습니다.
+              </p>
+
+              {app.sheetUrl ? (
+                <div className="mt-4 space-y-3">
+                  {app.sheetTitle && (
+                    <p className="text-xs font-medium text-neutral-800">
+                      {app.sheetTitle}
+                    </p>
+                  )}
+                  <div className="relative h-[70vh] w-full overflow-auto rounded-lg border border-neutral-200 bg-neutral-50">
+                    {isPdfSheet(app.sheetUrl) ? (
+                      <iframe
+                        src={app.sheetUrl}
+                        className="h-full w-full"
+                        title={app.sheetTitle || "악보"}
+                      />
+                    ) : (
+                      <img
+                        src={app.sheetUrl}
+                        alt={app.sheetTitle || "악보"}
+                        className="h-full w-full object-contain"
+                      />
+                    )}
+                  </div>
+                  <a
+                    href={app.sheetUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-xs text-blue-600 underline underline-offset-2"
+                  >
+                    새 탭에서 악보 열기
+                  </a>
+                </div>
+              ) : (
+                <p className="mt-4 text-xs text-neutral-400">
+                  등록된 악보 링크가 없습니다.
+                </p>
+              )}
+            </section>
+          </aside>
+
+          {/* 오른쪽: 평가 영역 */}
           <div className="flex-1 min-w-0">
             {/* 학생 정보 */}
             <section className="mb-6 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-4 text-sm">
@@ -357,48 +417,6 @@ export default function EvaluateStudentPage({
               {saving ? "저장 중..." : "평가 저장"}
             </button>
           </div>
-
-          {/* 오른쪽: 악보 영역 */}
-          <aside className="lg:w-[360px] xl:w-[420px]">
-            <section className="rounded-xl border border-neutral-200 bg-white px-4 py-4 text-sm shadow-sm">
-              <h2 className="text-sm font-medium text-neutral-900">
-                악보 보기
-              </h2>
-              <p className="mt-1 text-xs text-neutral-500">
-                관리자 페이지 &quot;악보 관리&quot;에서 학생별 악보 링크를
-                설정할 수 있습니다.
-              </p>
-
-              {app.sheetUrl ? (
-                <div className="mt-4 space-y-3">
-                  {app.sheetTitle && (
-                    <p className="text-xs font-medium text-neutral-800">
-                      {app.sheetTitle}
-                    </p>
-                  )}
-                  <div className="aspect-3/4 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50">
-                    <iframe
-                      src={app.sheetUrl}
-                      className="h-full w-full"
-                      title={app.sheetTitle || "악보"}
-                    />
-                  </div>
-                  <a
-                    href={app.sheetUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block text-xs text-blue-600 underline underline-offset-2"
-                  >
-                    새 탭에서 악보 열기
-                  </a>
-                </div>
-              ) : (
-                <p className="mt-4 text-xs text-neutral-400">
-                  등록된 악보 링크가 없습니다.
-                </p>
-              )}
-            </section>
-          </aside>
         </div>
       </div>
     </div>
