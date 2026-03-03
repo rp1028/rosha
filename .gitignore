@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# uploaded files (악보 등)
+/public/uploads
+
 # debug
 npm-debug.log*
 yarn-debug.log*

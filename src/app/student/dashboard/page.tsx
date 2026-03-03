@@ -108,11 +108,13 @@ export default function StudentDashboard() {
           {/* 회차 선택 */}
           {applications.length > 1 && (
             <div className="mb-6">
-              <label className="block text-sm font-medium mb-1">회차 선택</label>
+              <label className="block text-sm font-medium mb-2 text-neutral-800">
+                회차 선택
+              </label>
               <select
                 value={selectedAppId}
                 onChange={(e) => setSelectedAppId(e.target.value)}
-                className="border rounded-lg px-3 py-2 w-full max-w-md"
+                className="h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
               >
                 {applications.map((app) => (
                   <option key={app.id} value={app.id}>

@@ -54,6 +54,8 @@ model Application {
   session     Session      @relation(fields: [sessionId], references: [id])
   evaluations Evaluation[]
   videos      Video[]
+  sheetUrl    String?
+  sheetTitle  String?
 
   @@unique([studentId, sessionId])
 }

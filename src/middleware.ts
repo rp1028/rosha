@@ -11,6 +11,7 @@ const adminOnlyPaths = [
   "/admin/evaluators",
   "/admin/sessions",
   "/admin/videos",
+  "/admin/email",
 ];
 
 export async function middleware(request: NextRequest) {

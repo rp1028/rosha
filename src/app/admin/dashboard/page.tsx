@@ -54,6 +54,18 @@ export default function AdminDashboard() {
       href: "/admin/videos",
       icon: "🎬",
     },
+    {
+      title: "악보 관리",
+      description: "학생별 클래식 악보 링크를 등록합니다.",
+      href: "/admin/scores",
+      icon: "🎼",
+    },
+    {
+      title: "이메일 관리",
+      description: "학생에게 로그인 정보 이메일을 재발송합니다.",
+      href: "/admin/email",
+      icon: "📧",
+    },
   ];
 
   // 평가자는 평가하기만
@@ -78,40 +90,54 @@ export default function AdminDashboard() {
   const menuItems = isAdmin ? adminMenuItems : evaluatorMenuItems;
 
   return (
-    <div className="min-h-screen p-8 max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold">
-            {isAdmin ? "관리자 대시보드" : "평가자 대시보드"}
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {user?.name}님 환영합니다
-          </p>
-        </div>
-        <button
-          onClick={handleLogout}
-          className="text-gray-500 text-sm hover:text-gray-700"
-        >
-          로그아웃
-        </button>
-      </div>
-
-      <div className="grid gap-4">
-        {menuItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className="border rounded-lg p-6 hover:border-gray-400 transition block"
+    <div className="min-h-screen bg-white px-4 py-10">
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-8">
+        <header className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-medium tracking-[0.15em] text-neutral-400">
+              ROSHA ADMIN
+            </p>
+            <h1 className="mt-2 text-2xl font-semibold text-neutral-900">
+              {isAdmin ? "관리자 대시보드" : "평가자 대시보드"}
+            </h1>
+            <p className="mt-1 text-sm text-neutral-500">
+              {user?.name}님, 환영합니다.
+            </p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="text-xs text-neutral-400 hover:text-neutral-600 underline underline-offset-2"
           >
-            <div className="flex items-center gap-4">
-              <span className="text-2xl">{item.icon}</span>
-              <div>
-                <h2 className="font-medium">{item.title}</h2>
-                <p className="text-sm text-gray-500">{item.description}</p>
-              </div>
-            </div>
-          </Link>
-        ))}
+            로그아웃
+          </button>
+        </header>
+
+        <main>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {menuItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="group block rounded-xl border border-neutral-200 bg-white px-5 py-4 shadow-sm transition hover:border-neutral-400 hover:shadow-md"
+              >
+                <div className="flex items-start gap-4">
+                  <span className="mt-1 text-2xl">{item.icon}</span>
+                  <div className="flex-1">
+                    <h2 className="text-sm font-medium text-neutral-900">
+                      {item.title}
+                    </h2>
+                    <p className="mt-1 text-xs text-neutral-500">
+                      {item.description}
+                    </p>
+                  </div>
+                  <span className="mt-1 text-xs text-neutral-300 group-hover:text-neutral-500">
+                    →
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </main>
       </div>
     </div>
   );

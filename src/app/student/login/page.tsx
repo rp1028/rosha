@@ -38,50 +38,102 @@ export default function StudentLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-8">
-      <div className="max-w-sm w-full">
-        <Link href="/" className="text-gray-500 text-sm mb-6 block">
-          ← 돌아가기
-        </Link>
-        <h1 className="text-2xl font-bold mb-2">학생 로그인</h1>
-        <p className="text-gray-500 mb-8">
-          이메일로 받은 고유번호와 비밀번호를 입력해주세요.
-        </p>
+    <div className="min-h-screen bg-[#fefbf5] flex flex-col items-center justify-center px-4 py-8">
+      <div className="w-full max-w-3xl">
+        <div className="mb-12 text-center">
+          <p className="text-3xl font-semibold tracking-[0.18em] text-[#3f302d]">
+            Rosha
+          </p>
+          <p className="mt-2 text-sm text-[#816d65]">로샤 입시평가회</p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">고유번호</label>
+        <form
+          onSubmit={handleSubmit}
+          className="mx-auto w-full max-w-xl space-y-6"
+        >
+          <div className="space-y-2">
+            <label className="block text-sm font-medium tracking-wide text-[#4d3b37]">
+              ID
+            </label>
             <input
               type="text"
+              inputMode="numeric"
               value={uniqueCode}
               onChange={(e) => setUniqueCode(e.target.value)}
               required
-              placeholder="RE-2026-XXXXXX"
-              className="w-full border rounded-lg px-3 py-2 font-mono"
+              maxLength={6}
+              placeholder="260001"
+              className="h-11 w-full rounded-xl border border-[#cdbeb5] bg-white px-5 text-sm text-[#3f302d] placeholder:text-[#c2b3aa] shadow-[0_0_0_1px_rgba(0,0,0,0.02)] focus:border-[#5b4338] focus:outline-none focus:ring-2 focus:ring-[#5b4338]/20"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">비밀번호</label>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium tracking-wide text-[#4d3b37]">
+              Password
+            </label>
             <input
               type="password"
+              inputMode="numeric"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full border rounded-lg px-3 py-2"
+              maxLength={4}
+              placeholder="••••"
+              className="h-11 w-full rounded-xl border border-[#cdbeb5] bg-white px-5 text-sm text-[#3f302d] placeholder:text-[#c2b3aa] shadow-[0_0_0_1px_rgba(0,0,0,0.02)] focus:border-[#5b4338] focus:outline-none focus:ring-2 focus:ring-[#5b4338]/20"
             />
+
+            <div className="mt-2 flex flex-col gap-2 text-[11px] text-[#9c8d83] sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <span>You don&apos;t have ID? </span>
+                <Link
+                  href="/apply"
+                  className="font-semibold text-[#5b4338] underline underline-offset-2"
+                >
+                  Apply
+                </Link>
+              </div>
+              <button
+                type="button"
+                className="relative w-full text-left text-[#b3a59a] sm:w-auto sm:text-right"
+              >
+                <span className="border-b border-[#d5c7bc] pb-px">
+                  Forget ID &amp; Password?
+                </span>
+              </button>
+            </div>
           </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && (
+            <p className="text-sm text-red-500" role="alert">
+              {error}
+            </p>
+          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition disabled:bg-gray-400"
-          >
-            {loading ? "로그인 중..." : "로그인"}
-          </button>
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className="mx-auto block h-11 w-full max-w-xl rounded-xl bg-[#3f302d] text-sm font-medium text-white transition hover:bg-[#332623] disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {loading ? "로그인 중..." : "Login"}
+            </button>
+          </div>
         </form>
+
+        <div className="mt-16 flex flex-col items-center gap-3">
+          <Link
+            href="/admin/login"
+            className="inline-flex items-center justify-center rounded-xl border border-[#c4b6ae] bg-white px-8 py-2 text-sm text-[#3f302d] shadow-sm transition hover:bg-[#f6ede6]"
+          >
+            관리자 로그인
+          </Link>
+          <Link
+            href="/"
+            className="text-xs text-[#a29186] underline underline-offset-2"
+          >
+            홈으로 돌아가기
+          </Link>
+        </div>
       </div>
     </div>
   );

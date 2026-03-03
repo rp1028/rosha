@@ -92,140 +92,175 @@ export default function EvaluatorsPage() {
   }
 
   return (
-    <div className="min-h-screen p-8 max-w-3xl mx-auto">
-      <div className="flex items-center gap-4 mb-8">
-        <Link href="/admin/dashboard" className="text-gray-500 text-sm">
-          ← 대시보드
-        </Link>
-        <h1 className="text-2xl font-bold">평가자 관리</h1>
-      </div>
-
-      {message && (
-        <div className="bg-green-50 text-green-700 px-4 py-3 rounded-lg mb-4 text-sm">
-          {message}
+    <div className="min-h-screen bg-white px-4 py-10">
+      <div className="mx-auto w-full max-w-4xl">
+        <div className="mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/admin/dashboard"
+              className="text-xs text-neutral-400 hover:text-neutral-600"
+            >
+              ← 대시보드
+            </Link>
+            <h1 className="text-xl font-semibold text-neutral-900">
+              평가자 관리
+            </h1>
+          </div>
         </div>
-      )}
 
-      {/* 생성 버튼 / 폼 */}
-      {!showForm ? (
-        <button
-          onClick={() => setShowForm(true)}
-          className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition text-sm mb-6"
-        >
-          + 평가자 계정 생성
-        </button>
-      ) : (
-        <form
-          onSubmit={handleCreate}
-          className="border rounded-lg p-6 mb-6 flex flex-col gap-4"
-        >
-          <h2 className="font-medium">새 평가자 계정</h2>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">이름</label>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              placeholder="홍길동"
-              required
-              className="w-full border rounded-lg px-3 py-2"
-            />
+        {message && (
+          <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs text-emerald-800">
+            {message}
           </div>
+        )}
 
-          <div>
-            <label className="block text-sm font-medium mb-1">아이디</label>
-            <input
-              type="text"
-              value={form.loginId}
-              onChange={(e) => setForm({ ...form, loginId: e.target.value })}
-              placeholder="teacher1"
-              required
-              className="w-full border rounded-lg px-3 py-2"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">비밀번호</label>
-            <input
-              type="text"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              placeholder="비밀번호"
-              required
-              className="w-full border rounded-lg px-3 py-2"
-            />
-            <p className="text-xs text-gray-400 mt-1">
-              평가 당일 노트북에 미리 로그인해둘 용도이므로 간단하게 설정해도
-              됩니다.
-            </p>
-          </div>
-
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={saving}
-              className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition text-sm disabled:bg-gray-400"
-            >
-              {saving ? "생성 중..." : "생성"}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setShowForm(false);
-                setError("");
-              }}
-              className="border px-4 py-2 rounded-lg hover:bg-gray-50 transition text-sm"
-            >
-              취소
-            </button>
-          </div>
-        </form>
-      )}
-
-      {/* 평가자 목록 */}
-      <div className="flex flex-col gap-3">
-        <h2 className="font-medium text-sm text-gray-500">
-          등록된 평가자 ({evaluators.length}명)
-        </h2>
-
-        {evaluators.length === 0 ? (
-          <p className="text-gray-400 text-sm">등록된 평가자가 없습니다.</p>
+        {/* 생성 버튼 / 폼 */}
+        {!showForm ? (
+          <button
+            onClick={() => setShowForm(true)}
+            className="mb-6 h-9 rounded-xl bg-black px-4 text-xs font-medium text-white transition hover:bg-neutral-800"
+          >
+            + 평가자 계정 생성
+          </button>
         ) : (
-          evaluators.map((ev) => (
-            <div
-              key={ev.id}
-              className="border rounded-lg p-4 flex items-center justify-between"
-            >
+          <form
+            onSubmit={handleCreate}
+            className="mb-8 rounded-xl border border-neutral-200 bg-white px-5 py-5 text-sm shadow-sm"
+          >
+            <h2 className="text-sm font-medium text-neutral-900">
+              새 평가자 계정
+            </h2>
+
+            <div className="mt-4 space-y-3">
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">{ev.name}</span>
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded-full ${
-                      ev.role === "ADMIN"
-                        ? "bg-black text-white"
-                        : "bg-gray-100 text-gray-600"
-                    }`}
-                  >
-                    {ev.role === "ADMIN" ? "관리자" : "평가자"}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-500">아이디: {ev.loginId}</p>
+                <label className="block text-xs font-medium text-neutral-700">
+                  이름
+                </label>
+                <input
+                  type="text"
+                  value={form.name}
+                  onChange={(e) =>
+                    setForm({ ...form, name: e.target.value })
+                  }
+                  placeholder="홍길동"
+                  required
+                  className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                />
               </div>
 
-              {ev.role !== "ADMIN" && (
-                <button
-                  onClick={() => handleDelete(ev)}
-                  className="text-red-500 text-sm hover:text-red-700 transition"
-                >
-                  삭제
-                </button>
-              )}
+              <div>
+                <label className="block text-xs font-medium text-neutral-700">
+                  아이디
+                </label>
+                <input
+                  type="text"
+                  value={form.loginId}
+                  onChange={(e) =>
+                    setForm({ ...form, loginId: e.target.value })
+                  }
+                  placeholder="teacher1"
+                  required
+                  className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-neutral-700">
+                  비밀번호
+                </label>
+                <input
+                  type="text"
+                  value={form.password}
+                  onChange={(e) =>
+                    setForm({ ...form, password: e.target.value })
+                  }
+                  placeholder="비밀번호"
+                  required
+                  className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                />
+                <p className="mt-1 text-[11px] text-neutral-400">
+                  평가 당일 노트북에 미리 로그인해둘 용도이므로 간단하게 설정해도
+                  됩니다.
+                </p>
+              </div>
             </div>
-          ))
+
+            {error && (
+              <p className="mt-3 text-xs text-red-500" role="alert">
+                {error}
+              </p>
+            )}
+
+            <div className="mt-4 flex gap-2">
+              <button
+                type="submit"
+                disabled={saving}
+                className="h-9 rounded-xl bg-black px-4 text-xs font-medium text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {saving ? "생성 중..." : "생성"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowForm(false);
+                  setError("");
+                }}
+                className="h-9 rounded-xl border border-neutral-300 px-4 text-xs text-neutral-800 transition hover:bg-neutral-50"
+              >
+                취소
+              </button>
+            </div>
+          </form>
         )}
+
+        {/* 평가자 목록 */}
+        <div className="flex flex-col gap-3">
+          <h2 className="text-xs font-medium text-neutral-500">
+            등록된 평가자 ({evaluators.length}명)
+          </h2>
+
+          {evaluators.length === 0 ? (
+            <p className="text-xs text-neutral-400">
+              등록된 평가자가 없습니다.
+            </p>
+          ) : (
+            evaluators.map((ev) => (
+              <div
+                key={ev.id}
+                className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-5 py-3 text-sm shadow-sm"
+              >
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-neutral-900">
+                      {ev.name}
+                    </span>
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[11px] ${
+                        ev.role === "ADMIN"
+                          ? "bg-neutral-900 text-white"
+                          : "bg-neutral-100 text-neutral-600"
+                      }`}
+                    >
+                      {ev.role === "ADMIN" ? "관리자" : "평가자"}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-neutral-500">
+                    아이디: {ev.loginId}
+                  </p>
+                </div>
+
+                {ev.role !== "ADMIN" && (
+                  <button
+                    onClick={() => handleDelete(ev)}
+                    className="text-xs text-red-500 hover:text-red-700"
+                  >
+                    삭제
+                  </button>
+                )}
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

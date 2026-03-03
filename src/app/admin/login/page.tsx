@@ -38,47 +38,78 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-8">
-      <div className="max-w-sm w-full">
-        <Link href="/" className="text-gray-500 text-sm mb-6 block">
-          ← 돌아가기
-        </Link>
-        <h1 className="text-2xl font-bold mb-2">관리자 로그인</h1>
-        <p className="text-gray-500 mb-8">관리자 계정으로 로그인하세요.</p>
+    <div className="min-h-screen bg-[#fefbf5] flex flex-col items-center justify-center px-4 py-8">
+      <div className="w-full max-w-3xl">
+        <div className="mb-12 text-center">
+          <p className="text-3xl font-semibold tracking-[0.18em] text-[#3f302d]">
+            Rosha
+          </p>
+          <p className="mt-2 text-sm text-[#816d65]">로샤 입시평가회</p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">아이디</label>
+        <form
+          onSubmit={handleSubmit}
+          className="mx-auto w-full max-w-xl space-y-6"
+        >
+          <div className="space-y-2">
+            <label className="block text-sm font-medium tracking-wide text-[#4d3b37]">
+              아이디
+            </label>
             <input
               type="text"
               value={loginId}
               onChange={(e) => setLoginId(e.target.value)}
               required
-              className="w-full border rounded-lg px-3 py-2"
+              placeholder=""
+              className="h-11 w-full rounded-xl border border-[#cdbeb5] bg-white px-5 text-sm text-[#3f302d] placeholder:text-[#c2b3aa] shadow-[0_0_0_1px_rgba(0,0,0,0.02)] focus:border-[#5b4338] focus:outline-none focus:ring-2 focus:ring-[#5b4338]/20"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">비밀번호</label>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium tracking-wide text-[#4d3b37]">
+              비밀번호
+            </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full border rounded-lg px-3 py-2"
+              placeholder=""
+              className="h-11 w-full rounded-xl border border-[#cdbeb5] bg-white px-5 text-sm text-[#3f302d] placeholder:text-[#c2b3aa] shadow-[0_0_0_1px_rgba(0,0,0,0.02)] focus:border-[#5b4338] focus:outline-none focus:ring-2 focus:ring-[#5b4338]/20"
             />
           </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && (
+            <p className="text-sm text-red-500" role="alert">
+              {error}
+            </p>
+          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition disabled:bg-gray-400"
-          >
-            {loading ? "로그인 중..." : "로그인"}
-          </button>
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className="mx-auto block h-11 w-full max-w-xl rounded-xl bg-[#3f302d] text-sm font-medium text-white transition hover:bg-[#332623] disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {loading ? "로그인 중..." : "로그인"}
+            </button>
+          </div>
         </form>
+
+        <div className="mt-10 flex flex-col items-center gap-3">
+          <Link
+            href="/student/login"
+            className="text-xs text-[#a29186] underline underline-offset-2"
+          >
+            학생 로그인 화면으로 돌아가기
+          </Link>
+          <Link
+            href="/"
+            className="text-xs text-[#a29186] underline underline-offset-2"
+          >
+            홈으로 돌아가기
+          </Link>
+        </div>
       </div>
     </div>
   );

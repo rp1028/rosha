@@ -73,15 +73,15 @@ async function main() {
   });
   console.log("✅ Session:", session.title);
 
-  // 테스트 학생 (uniqueCode/password가 Student에 있음)
+  // 테스트 학생 (새 형식: 아이디 260001, 비밀번호 1234)
   const student = await prisma.student.create({
     data: {
       name: "홍길동",
       phone: "010-1234-5678",
       email: "test@gmail.com",
       school: "서울예고",
-      uniqueCode: "RE-2026-TEST01",
-      password: await bcrypt.hash("test1234", 10),
+      uniqueCode: "260001",
+      password: await bcrypt.hash("1234", 10),
     },
   });
 
@@ -92,7 +92,7 @@ async function main() {
       sessionId: session.id,
     },
   });
-  console.log("✅ Student:", student.name, "→", student.uniqueCode);
+  console.log("✅ Student:", student.name, "→ 아이디:", student.uniqueCode, "/ 비밀번호: 1234");
 
   console.log("🎉 Seed complete!");
 }

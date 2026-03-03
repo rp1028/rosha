@@ -86,7 +86,7 @@ export async function POST(request: Request) {
       });
     } else {
       // 신규 학생: uniqueCode/password 발급
-      const uniqueCode = generateUniqueCode();
+      const uniqueCode = await generateUniqueCode(prisma);
       const rawPassword = generatePassword();
       const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
@@ -98,7 +98,6 @@ export async function POST(request: Request) {
         },
       });
 
-      // 신규 학생에게만 비밀번호 반환 (나중에 이메일 정상화되면 제거)
       // 4. 같은 회차 중복 신청 체크
       const existing = await prisma.application.findUnique({
         where: { studentId_sessionId: { studentId: student.id, sessionId } },

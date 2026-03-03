@@ -1,25 +1,41 @@
-import { v4 as uuidv4 } from "uuid";
+import { PrismaClient } from "@prisma/client";
 
 /**
- * 학생 고유번호 생성 (ex: RE-2026-A3B4C5)
- * RE = Rosha Eval, 년도, 랜덤 6자리
+ * 학생 고유번호 생성 (ex: 260001)
+ * 년도 2자리 + 순번 4자리 (0001~9999)
+ * DB에서 해당 년도의 마지막 순번을 조회하여 +1
  */
-export function generateUniqueCode(): string {
-  const year = new Date().getFullYear();
-  const random = uuidv4().replace(/-/g, "").substring(0, 6).toUpperCase();
-  return `RE-${year}-${random}`;
+export async function generateUniqueCode(prisma: PrismaClient): Promise<string> {
+  const yearPrefix = String(new Date().getFullYear()).slice(-2); // "26"
+
+  // 해당 년도로 시작하는 가장 큰 uniqueCode 조회
+  const lastStudent = await prisma.student.findFirst({
+    where: {
+      uniqueCode: { startsWith: yearPrefix },
+    },
+    orderBy: { uniqueCode: "desc" },
+    select: { uniqueCode: true },
+  });
+
+  let nextNumber = 1;
+  if (lastStudent) {
+    const lastNumber = parseInt(lastStudent.uniqueCode.slice(2), 10);
+    nextNumber = lastNumber + 1;
+  }
+
+  if (nextNumber > 9999) {
+    throw new Error("해당 년도의 학생 번호가 모두 소진되었습니다.");
+  }
+
+  return `${yearPrefix}${String(nextNumber).padStart(4, "0")}`;
 }
 
 /**
- * 임시 비밀번호 생성 (8자리 영숫자)
+ * 비밀번호 생성 (랜덤 숫자 4자리)
  */
 export function generatePassword(): string {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
-  let password = "";
-  for (let i = 0; i < 8; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return password;
+  const pin = Math.floor(1000 + Math.random() * 9000); // 1000~9999
+  return String(pin);
 }
 
 /**
