@@ -36,7 +36,7 @@ export async function GET() {
 
     // 팝업 노출 기간에 해당하는 회차 찾기
     // popupStart = examDate - 10일, popupEnd = registrationEnd
-    const upcomingSession = sessions.find((s) => {
+    const candidateSession = sessions.find((s) => {
       const popupStart = new Date(s.date);
       popupStart.setDate(popupStart.getDate() - 10);
       const popupEnd = new Date(s.registrationEnd!);
@@ -44,16 +44,30 @@ export async function GET() {
       return now >= popupStart && now <= popupEnd;
     });
 
-    if (!upcomingSession) {
+    if (!candidateSession) {
+      return apiSuccess(null);
+    }
+
+    // 이미 해당 회차를 신청한 학생이면 팝업 미표시
+    const existingApplication = await prisma.application.findUnique({
+      where: {
+        studentId_sessionId: {
+          studentId: auth.id,
+          sessionId: candidateSession.id,
+        },
+      },
+    });
+
+    if (existingApplication) {
       return apiSuccess(null);
     }
 
     return apiSuccess({
-      id: upcomingSession.id,
-      title: upcomingSession.title,
-      examDate: upcomingSession.date,
-      registrationEnd: upcomingSession.registrationEnd,
-      registrationStart: upcomingSession.registrationStart,
+      id: candidateSession.id,
+      title: candidateSession.title,
+      examDate: candidateSession.date,
+      registrationEnd: candidateSession.registrationEnd,
+      registrationStart: candidateSession.registrationStart,
     });
   } catch {
     return apiError("다음 회차 조회에 실패했습니다.", 500);

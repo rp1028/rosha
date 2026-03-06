@@ -53,8 +53,6 @@ export async function PATCH(
       title,
       description,
       date,
-      registrationStart,
-      registrationEnd,
       status,
       criteria,
     } = body;
@@ -64,13 +62,20 @@ export async function PATCH(
     if (title !== undefined) updateData.title = String(title);
     if (description !== undefined)
       updateData.description = description === "" ? null : String(description);
-    if (date !== undefined) updateData.date = new Date(date);
-    if (registrationStart !== undefined)
-      updateData.registrationStart =
-        registrationStart === "" ? null : new Date(registrationStart);
-    if (registrationEnd !== undefined)
-      updateData.registrationEnd =
-        registrationEnd === "" ? null : new Date(registrationEnd);
+    if (date !== undefined) {
+      const evalDate = new Date(date);
+      updateData.date = evalDate;
+      updateData.registrationStart = (() => {
+        const d = new Date(evalDate);
+        d.setDate(d.getDate() - 14);
+        return d;
+      })();
+      updateData.registrationEnd = (() => {
+        const d = new Date(evalDate);
+        d.setDate(d.getDate() - 1);
+        return d;
+      })();
+    }
     if (status !== undefined && ["RECRUITING", "IN_PROGRESS", "COMPLETED"].includes(status))
       updateData.status = status;
 

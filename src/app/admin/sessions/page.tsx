@@ -40,8 +40,6 @@ export default function SessionsPage() {
     title: "",
     description: "",
     date: "",
-    registrationStart: "",
-    registrationEnd: "",
   });
   const [criteriaList, setCriteriaList] = useState<CriteriaInput[]>([
     { name: "음정", maxScore: 20 },
@@ -57,8 +55,6 @@ export default function SessionsPage() {
     title: "",
     description: "",
     date: "",
-    registrationStart: "",
-    registrationEnd: "",
   });
   const [editCriteriaList, setEditCriteriaList] = useState<CriteriaInput[]>([]);
   const [editLoading, setEditLoading] = useState(false);
@@ -119,8 +115,6 @@ export default function SessionsPage() {
           title: "",
           description: "",
           date: "",
-          registrationStart: "",
-          registrationEnd: "",
         });
         setCriteriaList([
           { name: "음정", maxScore: 20 },
@@ -151,12 +145,6 @@ export default function SessionsPage() {
       title: session.title,
       description: session.description ?? "",
       date: session.date.slice(0, 10),
-      registrationStart: session.registrationStart
-        ? session.registrationStart.slice(0, 10)
-        : "",
-      registrationEnd: session.registrationEnd
-        ? session.registrationEnd.slice(0, 10)
-        : "",
     });
     setEditCriteriaList(
       (session.criteria || []).map((c) => ({
@@ -208,8 +196,6 @@ export default function SessionsPage() {
     try {
       const body: Record<string, unknown> = {
         ...editForm,
-        registrationStart: editForm.registrationStart || null,
-        registrationEnd: editForm.registrationEnd || null,
       };
       if (canEditCriteria) body.criteria = validCriteria;
 
@@ -308,7 +294,7 @@ export default function SessionsPage() {
               </div>
 
               {/* 평가 당일 */}
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-xs font-medium text-neutral-700">
                   평가 당일 <span className="text-red-400">*</span>
                 </label>
@@ -319,40 +305,8 @@ export default function SessionsPage() {
                   required
                   className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
                 />
-              </div>
-
-              {/* 신청 시작일 */}
-              <div>
-                <label className="block text-xs font-medium text-neutral-700">
-                  신청 시작일{" "}
-                  <span className="text-neutral-400">(선택)</span>
-                </label>
-                <input
-                  type="date"
-                  value={form.registrationStart}
-                  onChange={(e) =>
-                    setForm({ ...form, registrationStart: e.target.value })
-                  }
-                  className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
-                />
-              </div>
-
-              {/* 신청 마감일 */}
-              <div>
-                <label className="block text-xs font-medium text-neutral-700">
-                  신청 마감일{" "}
-                  <span className="text-neutral-400">(팝업 노출 기준)</span>
-                </label>
-                <input
-                  type="date"
-                  value={form.registrationEnd}
-                  onChange={(e) =>
-                    setForm({ ...form, registrationEnd: e.target.value })
-                  }
-                  className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
-                />
                 <p className="mt-1 text-[11px] text-neutral-400">
-                  입력 시 평가일 10일 전부터 마감일까지 학생 화면에 팝업 표시
+                  신청 기간: 평가일 2주 전 ~ 1일 전 (자동 설정)
                 </p>
               </div>
 
@@ -457,7 +411,7 @@ export default function SessionsPage() {
                 />
               </div>
 
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-xs font-medium text-neutral-700">
                   평가 당일 <span className="text-red-400">*</span>
                 </label>
@@ -470,42 +424,9 @@ export default function SessionsPage() {
                   required
                   className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
                 />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-neutral-700">
-                  신청 시작일{" "}
-                  <span className="text-neutral-400">(선택)</span>
-                </label>
-                <input
-                  type="date"
-                  value={editForm.registrationStart}
-                  onChange={(e) =>
-                    setEditForm({
-                      ...editForm,
-                      registrationStart: e.target.value,
-                    })
-                  }
-                  className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-neutral-700">
-                  신청 마감일{" "}
-                  <span className="text-neutral-400">(팝업 노출 기준)</span>
-                </label>
-                <input
-                  type="date"
-                  value={editForm.registrationEnd}
-                  onChange={(e) =>
-                    setEditForm({
-                      ...editForm,
-                      registrationEnd: e.target.value,
-                    })
-                  }
-                  className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
-                />
+                <p className="mt-1 text-[11px] text-neutral-400">
+                  신청 기간: 평가일 2주 전 ~ 1일 전 (자동 설정)
+                </p>
               </div>
 
               <div className="md:col-span-2">

@@ -244,7 +244,11 @@ export default function ApplyPage() {
                 setForm({ ...form, sessionId: e.target.value })
               }
               required
-              className="w-full h-11 rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-800/10"
+              className={`w-full h-11 rounded-xl border bg-white px-3 text-sm text-neutral-900 focus:outline-none focus:ring-2 ${
+                sessions.length === 0
+                  ? "border-red-500 bg-red-50 focus:ring-red-200"
+                  : "border-neutral-300 focus:border-neutral-800 focus:ring-neutral-800/10"
+              }`}
             >
               <option value="">회차를 선택해주세요</option>
               {sessions.map((s) => (
@@ -253,6 +257,15 @@ export default function ApplyPage() {
                 </option>
               ))}
             </select>
+            {sessions.length === 0 ? (
+              <p className="mt-1 text-xs text-red-500">
+                현재 접수 중인 회차가 없습니다. 일정 확인 후 다시 접속해 주시기 바랍니다.
+              </p>
+            ) : (
+              <p className="mt-1 text-xs text-neutral-400">
+                참가하실 평가회 회차를 선택해주세요
+              </p>
+            )}
           </div>
 
           <div>

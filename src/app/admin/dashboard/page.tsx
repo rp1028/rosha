@@ -61,9 +61,15 @@ export default function AdminDashboard() {
       icon: "🎼",
     },
     {
-      title: "이메일 관리",
+      title: "학생 결과 이메일 발송",
+      description: "평가 결과 열람 안내 이메일을 발송합니다.",
+      href: "/admin/email/result",
+      icon: "📨",
+    },
+    {
+      title: "로그인 정보 발송",
       description: "학생에게 로그인 정보 이메일을 재발송합니다.",
-      href: "/admin/email",
+      href: "/admin/email/login",
       icon: "📧",
     },
   ];
