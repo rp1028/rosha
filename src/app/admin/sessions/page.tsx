@@ -16,6 +16,9 @@ type Session = {
   title: string;
   description: string | null;
   date: string;
+  registrationStart: string | null;
+  registrationEnd: string | null;
+  resultUnlockedAt: string | null;
   status: string;
   _count: { applications: number };
   criteria: Criteria[];
@@ -33,7 +36,13 @@ export default function SessionsPage() {
   const router = useRouter();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ title: "", description: "", date: "" });
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    date: "",
+    registrationStart: "",
+    registrationEnd: "",
+  });
   const [criteriaList, setCriteriaList] = useState<CriteriaInput[]>([
     { name: "음정", maxScore: 20 },
     { name: "리듬", maxScore: 20 },
@@ -43,6 +52,16 @@ export default function SessionsPage() {
   ]);
   const [loading, setLoading] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [editingSession, setEditingSession] = useState<Session | null>(null);
+  const [editForm, setEditForm] = useState({
+    title: "",
+    description: "",
+    date: "",
+    registrationStart: "",
+    registrationEnd: "",
+  });
+  const [editCriteriaList, setEditCriteriaList] = useState<CriteriaInput[]>([]);
+  const [editLoading, setEditLoading] = useState(false);
 
   const fetchSessions = () => {
     fetch("/api/admin/sessions")
@@ -96,7 +115,13 @@ export default function SessionsPage() {
       });
       if (res.ok) {
         setShowForm(false);
-        setForm({ title: "", description: "", date: "" });
+        setForm({
+          title: "",
+          description: "",
+          date: "",
+          registrationStart: "",
+          registrationEnd: "",
+        });
         setCriteriaList([
           { name: "음정", maxScore: 20 },
           { name: "리듬", maxScore: 20 },
@@ -120,11 +145,99 @@ export default function SessionsPage() {
     fetchSessions();
   };
 
+  const startEdit = (session: Session) => {
+    setEditingSession(session);
+    setEditForm({
+      title: session.title,
+      description: session.description ?? "",
+      date: session.date.slice(0, 10),
+      registrationStart: session.registrationStart
+        ? session.registrationStart.slice(0, 10)
+        : "",
+      registrationEnd: session.registrationEnd
+        ? session.registrationEnd.slice(0, 10)
+        : "",
+    });
+    setEditCriteriaList(
+      (session.criteria || []).map((c) => ({
+        name: c.name,
+        maxScore: c.maxScore,
+      }))
+    );
+  };
+
+  const cancelEdit = () => {
+    setEditingSession(null);
+  };
+
+  const addEditCriteria = () => {
+    setEditCriteriaList([...editCriteriaList, { name: "", maxScore: 10 }]);
+  };
+
+  const removeEditCriteria = (index: number) => {
+    setEditCriteriaList(editCriteriaList.filter((_, i) => i !== index));
+  };
+
+  const updateEditCriteria = (
+    index: number,
+    field: keyof CriteriaInput,
+    value: string | number
+  ) => {
+    const updated = [...editCriteriaList];
+    if (field === "maxScore") {
+      updated[index][field] = Number(value);
+    } else {
+      updated[index][field] = value as string;
+    }
+    setEditCriteriaList(updated);
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    if (!editingSession) return;
+    e.preventDefault();
+
+    const canEditCriteria = editingSession._count.applications === 0;
+    const validCriteria = editCriteriaList.filter((c) => c.name.trim());
+
+    if (canEditCriteria && validCriteria.length === 0) {
+      alert("평가 항목을 최소 1개 이상 추가해주세요.");
+      return;
+    }
+
+    setEditLoading(true);
+    try {
+      const body: Record<string, unknown> = {
+        ...editForm,
+        registrationStart: editForm.registrationStart || null,
+        registrationEnd: editForm.registrationEnd || null,
+      };
+      if (canEditCriteria) body.criteria = validCriteria;
+
+      const res = await fetch(`/api/sessions/${editingSession.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "수정에 실패했습니다.");
+        return;
+      }
+
+      setEditingSession(null);
+      fetchSessions();
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
   const handleDelete = async (session: Session) => {
     const appCount = session._count.applications;
-    const message = appCount > 0
-      ? `"${session.title}"에 ${appCount}명의 신청 데이터가 있습니다.\n관련된 모든 데이터(신청, 평가, 영상)가 함께 삭제됩니다.\n\n정말 삭제하시겠습니까?`
-      : `"${session.title}"을(를) 삭제하시겠습니까?`;
+    const message =
+      appCount > 0
+        ? `"${session.title}"에 ${appCount}명의 신청 데이터가 있습니다.\n관련된 모든 데이터(신청, 평가, 영상)가 함께 삭제됩니다.\n\n정말 삭제하시겠습니까?`
+        : `"${session.title}"을(를) 삭제하시겠습니까?`;
 
     if (!confirm(message)) return;
 
@@ -150,15 +263,18 @@ export default function SessionsPage() {
   return (
     <div className="min-h-screen bg-white px-4 py-10">
       <div className="mx-auto w-full max-w-4xl">
-        <div className="mb-8 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <Link
               href="/admin/dashboard"
-              className="text-xs text-neutral-400 hover:text-neutral-600"
+              className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
             >
               ← 대시보드
             </Link>
-            <h1 className="text-xl font-semibold text-neutral-900">회차 관리</h1>
+            <span className="text-xs text-neutral-300">•</span>
+            <h1 className="text-sm font-semibold text-neutral-800">
+              회차 관리
+            </h1>
           </div>
           <button
             onClick={() => setShowForm(!showForm)}
@@ -176,84 +292,114 @@ export default function SessionsPage() {
             <h2 className="text-sm font-medium text-neutral-900">새 회차 생성</h2>
 
             <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
+              {/* 제목 */}
+              <div className="md:col-span-2">
                 <label className="block text-xs font-medium text-neutral-700">
                   제목
                 </label>
                 <input
                   type="text"
                   value={form.title}
-                  onChange={(e) =>
-                    setForm({ ...form, title: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
                   placeholder="예: 2026년 3회차 입시평가회"
                   required
                   className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
                 />
               </div>
+
+              {/* 평가 당일 */}
               <div>
                 <label className="block text-xs font-medium text-neutral-700">
-                  날짜
+                  평가 당일 <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="date"
                   value={form.date}
-                  onChange={(e) =>
-                    setForm({ ...form, date: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, date: e.target.value })}
                   required
+                  className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                />
+              </div>
+
+              {/* 신청 시작일 */}
+              <div>
+                <label className="block text-xs font-medium text-neutral-700">
+                  신청 시작일{" "}
+                  <span className="text-neutral-400">(선택)</span>
+                </label>
+                <input
+                  type="date"
+                  value={form.registrationStart}
+                  onChange={(e) =>
+                    setForm({ ...form, registrationStart: e.target.value })
+                  }
+                  className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                />
+              </div>
+
+              {/* 신청 마감일 */}
+              <div>
+                <label className="block text-xs font-medium text-neutral-700">
+                  신청 마감일{" "}
+                  <span className="text-neutral-400">(팝업 노출 기준)</span>
+                </label>
+                <input
+                  type="date"
+                  value={form.registrationEnd}
+                  onChange={(e) =>
+                    setForm({ ...form, registrationEnd: e.target.value })
+                  }
+                  className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                />
+                <p className="mt-1 text-[11px] text-neutral-400">
+                  입력 시 평가일 10일 전부터 마감일까지 학생 화면에 팝업 표시
+                </p>
+              </div>
+
+              {/* 설명 */}
+              <div className="md:col-span-2">
+                <label className="block text-xs font-medium text-neutral-700">
+                  설명 <span className="text-neutral-400">(선택)</span>
+                </label>
+                <input
+                  type="text"
+                  value={form.description}
+                  onChange={(e) =>
+                    setForm({ ...form, description: e.target.value })
+                  }
                   className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
                 />
               </div>
             </div>
 
-            <div className="mt-4">
-              <label className="block text-xs font-medium text-neutral-700">
-                설명 (선택)
-              </label>
-              <input
-                type="text"
-                value={form.description}
-                onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
-                }
-                placeholder="회차에 대한 간단한 설명"
-                className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
-              />
-            </div>
-
             {/* 평가 항목 */}
             <div className="mt-5">
-              <div className="mb-2 flex items-center justify-between">
+              <div className="flex items-center justify-between mb-2">
                 <label className="text-xs font-medium text-neutral-700">
                   평가 항목 (총 {totalMaxScore}점)
                 </label>
                 <button
                   type="button"
                   onClick={addCriteria}
-                  className="text-[11px] font-medium text-neutral-700 underline underline-offset-2"
+                  className="text-xs text-blue-500 hover:text-blue-700"
                 >
                   + 항목 추가
                 </button>
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="space-y-2">
                 {criteriaList.map((c, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <input
                       type="text"
                       value={c.name}
-                      onChange={(e) =>
-                        updateCriteria(i, "name", e.target.value)
-                      }
+                      onChange={(e) => updateCriteria(i, "name", e.target.value)}
                       placeholder="항목명"
                       className="flex-1 h-9 rounded-xl border border-neutral-300 bg-white px-3 text-xs text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
                     />
                     <input
                       type="number"
                       value={c.maxScore}
-                      onChange={(e) =>
-                        updateCriteria(i, "maxScore", e.target.value)
-                      }
+                      onChange={(e) => updateCriteria(i, "maxScore", e.target.value)}
                       min={1}
                       className="h-9 w-20 rounded-xl border border-neutral-300 bg-white px-2 text-xs text-center text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
                     />
@@ -284,6 +430,197 @@ export default function SessionsPage() {
           </form>
         )}
 
+        {/* 회차 수정 폼 */}
+        {editingSession && (
+          <form
+            onSubmit={handleEditSubmit}
+            className="mb-8 rounded-xl border border-neutral-200 bg-white px-5 py-5 shadow-sm"
+          >
+            <h2 className="text-sm font-medium text-neutral-900">
+              회차 수정: {editingSession.title}
+            </h2>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="md:col-span-2">
+                <label className="block text-xs font-medium text-neutral-700">
+                  제목
+                </label>
+                <input
+                  type="text"
+                  value={editForm.title}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, title: e.target.value })
+                  }
+                  placeholder="예: 2026년 3회차 입시평가회"
+                  required
+                  className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-neutral-700">
+                  평가 당일 <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={editForm.date}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, date: e.target.value })
+                  }
+                  required
+                  className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-neutral-700">
+                  신청 시작일{" "}
+                  <span className="text-neutral-400">(선택)</span>
+                </label>
+                <input
+                  type="date"
+                  value={editForm.registrationStart}
+                  onChange={(e) =>
+                    setEditForm({
+                      ...editForm,
+                      registrationStart: e.target.value,
+                    })
+                  }
+                  className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-neutral-700">
+                  신청 마감일{" "}
+                  <span className="text-neutral-400">(팝업 노출 기준)</span>
+                </label>
+                <input
+                  type="date"
+                  value={editForm.registrationEnd}
+                  onChange={(e) =>
+                    setEditForm({
+                      ...editForm,
+                      registrationEnd: e.target.value,
+                    })
+                  }
+                  className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-xs font-medium text-neutral-700">
+                  설명 <span className="text-neutral-400">(선택)</span>
+                </label>
+                <input
+                  type="text"
+                  value={editForm.description}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, description: e.target.value })
+                  }
+                  className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                />
+              </div>
+            </div>
+
+            {/* 평가 항목 - 신청 0명일 때만 수정 가능 */}
+            <div className="mt-5">
+              <label className="block text-xs font-medium text-neutral-700">
+                평가 항목
+                {editingSession._count.applications > 0 && (
+                  <span className="ml-2 text-neutral-400">
+                    (이미 신청이 있어 수정 불가)
+                  </span>
+                )}
+              </label>
+              {editingSession._count.applications > 0 ? (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {editingSession.criteria?.map((c) => (
+                    <span
+                      key={c.id}
+                      className="rounded-lg bg-neutral-100 px-2 py-1 text-[11px] text-neutral-600"
+                    >
+                      {c.name} {c.maxScore}점
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between mb-2 mt-2">
+                    <span className="text-[11px] text-neutral-500">
+                      총{" "}
+                      {editCriteriaList.reduce(
+                        (sum, c) => sum + c.maxScore,
+                        0
+                      )}
+                      점
+                    </span>
+                    <button
+                      type="button"
+                      onClick={addEditCriteria}
+                      className="text-xs text-blue-500 hover:text-blue-700"
+                    >
+                      + 항목 추가
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {editCriteriaList.map((c, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={c.name}
+                          onChange={(e) =>
+                            updateEditCriteria(i, "name", e.target.value)
+                          }
+                          placeholder="항목명"
+                          className="flex-1 h-9 rounded-xl border border-neutral-300 bg-white px-3 text-xs text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                        />
+                        <input
+                          type="number"
+                          value={c.maxScore}
+                          onChange={(e) =>
+                            updateEditCriteria(i, "maxScore", e.target.value)
+                          }
+                          min={1}
+                          className="h-9 w-20 rounded-xl border border-neutral-300 bg-white px-2 text-xs text-center text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                        />
+                        <span className="text-[11px] text-neutral-400">점</span>
+                        {editCriteriaList.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeEditCriteria(i)}
+                            className="text-xs text-red-400 hover:text-red-600"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="mt-5 flex gap-2">
+              <button
+                type="button"
+                onClick={cancelEdit}
+                className="h-10 flex-1 rounded-xl border border-neutral-300 text-sm font-medium text-neutral-700 transition hover:bg-neutral-50"
+              >
+                취소
+              </button>
+              <button
+                type="submit"
+                disabled={editLoading}
+                className="h-10 flex-1 rounded-xl bg-black text-sm font-medium text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {editLoading ? "저장 중..." : "수정 저장"}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* 회차 목록 */}
         <div className="flex flex-col gap-3">
           {sessions.map((session) => (
             <div
@@ -294,11 +631,32 @@ export default function SessionsPage() {
                 <h2 className="text-sm font-medium text-neutral-900">
                   {session.title}
                 </h2>
+                <div className="flex items-center gap-2">
+                  {/* 결과 공개 여부 배지 */}
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                      session.resultUnlockedAt
+                        ? "bg-green-100 text-green-700"
+                        : "bg-neutral-100 text-neutral-500"
+                    }`}
+                  >
+                    {session.resultUnlockedAt ? "결과 공개됨" : "결과 잠김"}
+                  </span>
+                </div>
               </div>
+
               <p className="mb-2 text-xs text-neutral-500">
-                {new Date(session.date).toLocaleDateString("ko-KR")} ·{" "}
+                평가일: {new Date(session.date).toLocaleDateString("ko-KR")} ·{" "}
                 {session._count.applications}명 신청
               </p>
+
+              {/* 신청 기간 */}
+              {session.registrationEnd && (
+                <p className="mb-2 text-xs text-neutral-400">
+                  신청 마감:{" "}
+                  {new Date(session.registrationEnd).toLocaleDateString("ko-KR")}
+                </p>
+              )}
 
               {/* 평가 항목 토글 */}
               {session.criteria?.length > 0 && (
@@ -315,13 +673,13 @@ export default function SessionsPage() {
                     {expandedId === session.id ? "▲" : "▼"}
                   </button>
                   {expandedId === session.id && (
-                    <div className="mt-2 flex flex-wrap gap-1">
+                    <div className="mt-2 flex flex-wrap gap-2">
                       {session.criteria.map((c) => (
                         <span
                           key={c.id}
-                          className="rounded-full bg-neutral-100 px-2 py-1 text-[11px] text-neutral-700"
+                          className="rounded-lg bg-neutral-100 px-2 py-1 text-[11px] text-neutral-600"
                         >
-                          {c.name} ({c.maxScore}점)
+                          {c.name} {c.maxScore}점
                         </span>
                       ))}
                     </div>
@@ -329,31 +687,29 @@ export default function SessionsPage() {
                 </div>
               )}
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-neutral-500">상태</span>
-                  <select
-                    value={session.status}
-                    onChange={(e) =>
-                      handleStatusChange(session.id, e.target.value)
-                    }
-                    className={`h-7 rounded-full border px-3 text-[11px] ${
-                      session.status === "RECRUITING"
-                        ? "border-emerald-100 bg-emerald-50 text-emerald-700"
-                        : session.status === "IN_PROGRESS"
-                        ? "border-amber-100 bg-amber-50 text-amber-700"
-                        : "border-neutral-200 bg-neutral-50 text-neutral-600"
-                    }`}
-                  >
-                    <option value="RECRUITING">모집중</option>
-                    <option value="IN_PROGRESS">진행중</option>
-                    <option value="COMPLETED">완료</option>
-                  </select>
-                </div>
-
+              {/* 상태 변경 + 수정 + 삭제 */}
+              <div className="flex items-center gap-2 mt-3">
+                <select
+                  value={session.status}
+                  onChange={(e) => handleStatusChange(session.id, e.target.value)}
+                  className="h-8 rounded-lg border border-neutral-200 bg-white px-2 text-xs text-neutral-700 focus:outline-none"
+                >
+                  {Object.entries(STATUS_LABEL).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => startEdit(session)}
+                  className="h-8 rounded-lg border border-neutral-200 px-3 text-xs text-neutral-600 hover:bg-neutral-50"
+                >
+                  수정
+                </button>
                 <button
                   onClick={() => handleDelete(session)}
-                  className="text-[11px] text-red-500 hover:text-red-700"
+                  className="h-8 rounded-lg border border-red-200 px-3 text-xs text-red-400 hover:bg-red-50 hover:text-red-600"
                 >
                   삭제
                 </button>

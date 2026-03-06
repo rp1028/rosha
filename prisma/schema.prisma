@@ -8,15 +8,19 @@ datasource db {
 
 // 회차 (ex: 2026년 3회차 입시평가회)
 model Session {
-  id           String        @id @default(uuid())
-  title        String        // "2026년 3회차 입시평가회"
-  description  String?
-  date         DateTime
-  status       SessionStatus @default(RECRUITING)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  applications Application[]
-  criteria     EvaluationCriteria[]
+  id                String        @id @default(uuid())
+  title             String        // "2026년 3회차 입시평가회"
+  description       String?
+  date              DateTime      // 평가 당일
+  registrationStart DateTime?     // 신청 시작일 (선택)
+  registrationEnd   DateTime?     // 신청 마감일 (팝업 종료 기준)
+  resultUnlockedAt  DateTime?     // null=결과 잠김, 값 있으면=자동 열람 허용
+  adminSummary      String?       // 관리자 종합 코멘트 (학생에게 표시)
+  status            SessionStatus @default(RECRUITING)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  applications      Application[]
+  criteria          EvaluationCriteria[]
 }
 
 enum SessionStatus {
@@ -43,33 +47,35 @@ model Student {
 
 // 신청 (학생 + 회차)
 model Application {
-  id          String       @id @default(uuid())
-  desiredUniv String       // 희망 대학교
+  id          String            @id @default(uuid())
+  desiredUniv String            // 희망 대학교
   studentId   String
   sessionId   String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 
-  student     Student      @relation(fields: [studentId], references: [id])
-  session     Session      @relation(fields: [sessionId], references: [id])
+  student     Student           @relation(fields: [studentId], references: [id])
+  session     Session           @relation(fields: [sessionId], references: [id])
   evaluations Evaluation[]
   videos      Video[]
   sheetUrl    String?
   sheetTitle  String?
+  annotations ScoreAnnotation[]
 
   @@unique([studentId, sessionId])
 }
 
 // 평가자 (선생님 / 관리자)
 model Evaluator {
-  id          String       @id @default(uuid())
+  id          String           @id @default(uuid())
   name        String
-  loginId     String       @unique
+  loginId     String           @unique
   password    String
-  role        EvalRole     @default(EVALUATOR)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  role        EvalRole         @default(EVALUATOR)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
   evaluations Evaluation[]
+  annotations ScoreAnnotation[]
 }
 
 enum EvalRole {
@@ -130,4 +136,32 @@ model Video {
   createdAt     DateTime @default(now())
 
   application Application @relation(fields: [applicationId], references: [id])
+}
+
+// 악보 코멘트 (마디/구간별 메모)
+model ScoreAnnotation {
+  id            String         @id @default(uuid())
+  applicationId String
+  evaluatorId   String
+  measureNumber Int?
+  timePosition  String?        // "01:23" 형태 등 자유 텍스트
+  tag           AnnotationTag?
+  content       String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  application   Application    @relation(fields: [applicationId], references: [id])
+  evaluator     Evaluator      @relation(fields: [evaluatorId], references: [id])
+
+  @@index([applicationId])
+  @@index([evaluatorId])
+}
+
+enum AnnotationTag {
+  INTONATION
+  RHYTHM
+  TEMPO
+  DYNAMICS
+  EXPRESSION
+  OTHER
 }

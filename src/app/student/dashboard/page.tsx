@@ -29,10 +29,21 @@ type Video = {
 type ApplicationInfo = {
   id: string;
   sessionTitle: string;
+  sessionDate: string;
   desiredUniv: string;
+  isUnlocked: boolean;
+  adminSummary: string | null;
   evaluations: Evaluation[];
   videos: Video[];
 };
+
+type UpcomingSession = {
+  id: string;
+  title: string;
+  examDate: string;
+  registrationEnd: string;
+  registrationStart: string | null;
+} | null;
 
 function getYoutubeEmbedUrl(url: string): string | null {
   try {
@@ -45,12 +56,22 @@ function getYoutubeEmbedUrl(url: string): string | null {
   }
 }
 
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("ko-KR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
 export default function StudentDashboard() {
   const router = useRouter();
   const [applications, setApplications] = useState<ApplicationInfo[]>([]);
   const [selectedAppId, setSelectedAppId] = useState<string>("");
   const [tab, setTab] = useState<"evaluations" | "videos">("evaluations");
   const [loading, setLoading] = useState(true);
+  const [upcomingSession, setUpcomingSession] = useState<UpcomingSession>(null);
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     // 학생의 모든 신청(회차) 목록 가져오기
@@ -64,6 +85,17 @@ export default function StudentDashboard() {
         router.push("/student/login");
       })
       .finally(() => setLoading(false));
+
+    // 팝업용 다음 회차 정보 가져오기
+    fetch("/api/student/upcoming_session")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data) {
+          setUpcomingSession(data);
+          setShowPopup(true);
+        }
+      })
+      .catch(() => {});
   }, [router]);
 
   const selectedApp = applications.find((a) => a.id === selectedAppId);
@@ -89,6 +121,59 @@ export default function StudentDashboard() {
 
   return (
     <div className="min-h-screen p-8 max-w-3xl mx-auto">
+
+      {/* ── 다음 회차 신청 팝업 ── */}
+      {showPopup && upcomingSession && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+            <div className="mb-1 flex items-center justify-between">
+              <span className="text-xs font-medium tracking-widest text-neutral-400 uppercase">
+                신청 안내
+              </span>
+              <button
+                onClick={() => setShowPopup(false)}
+                className="text-neutral-400 hover:text-neutral-600 text-lg leading-none"
+              >
+                ✕
+              </button>
+            </div>
+
+            <h2 className="mt-3 text-lg font-semibold text-neutral-900">
+              {upcomingSession.title}
+            </h2>
+
+            <div className="mt-4 space-y-2 rounded-xl bg-neutral-50 px-4 py-3 text-sm text-neutral-700">
+              <div className="flex justify-between">
+                <span className="text-neutral-500">평가일</span>
+                <span className="font-medium">{formatDate(upcomingSession.examDate)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-neutral-500">신청 마감</span>
+                <span className="font-medium text-red-500">
+                  {formatDate(upcomingSession.registrationEnd)}
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-5 flex flex-col gap-2">
+              <a
+                href={`/apply?sessionId=${upcomingSession.id}`}
+                className="flex h-11 items-center justify-center rounded-xl bg-neutral-900 text-sm font-medium text-white transition hover:bg-neutral-700"
+              >
+                {upcomingSession.title} 신청하기
+              </a>
+              <button
+                onClick={() => setShowPopup(false)}
+                className="h-9 rounded-xl text-sm text-neutral-400 hover:text-neutral-600"
+              >
+                나중에 하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 헤더 ── */}
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold">내 평가 결과</h1>
         <button
@@ -105,157 +190,176 @@ export default function StudentDashboard() {
         </p>
       ) : (
         <>
-          {/* 회차 선택 */}
-          {applications.length > 1 && (
-            <div className="mb-6">
-              <label className="block text-sm font-medium mb-2 text-neutral-800">
-                회차 선택
-              </label>
-              <select
-                value={selectedAppId}
-                onChange={(e) => setSelectedAppId(e.target.value)}
-                className="h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+          {/* ── 회차 선택 탭 ── */}
+          <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
+            {applications.map((app) => (
+              <button
+                key={app.id}
+                onClick={() => {
+                  setSelectedAppId(app.id);
+                  setTab("evaluations");
+                }}
+                className={`shrink-0 rounded-xl px-4 py-2 text-sm font-medium transition ${
+                  selectedAppId === app.id
+                    ? "bg-neutral-900 text-white"
+                    : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
+                }`}
               >
-                {applications.map((app) => (
-                  <option key={app.id} value={app.id}>
-                    {app.sessionTitle}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {/* 단일 회차면 제목 표시 */}
-          {applications.length === 1 && (
-            <p className="text-gray-600 mb-6">{selectedApp?.sessionTitle}</p>
-          )}
-
-          {/* 탭 */}
-          <div className="flex gap-4 border-b mb-6">
-            <button
-              onClick={() => setTab("evaluations")}
-              className={`pb-2 px-1 text-sm font-medium transition ${
-                tab === "evaluations"
-                  ? "border-b-2 border-black text-black"
-                  : "text-gray-400"
-              }`}
-            >
-              평가 결과
-            </button>
-            <button
-              onClick={() => setTab("videos")}
-              className={`pb-2 px-1 text-sm font-medium transition ${
-                tab === "videos"
-                  ? "border-b-2 border-black text-black"
-                  : "text-gray-400"
-              }`}
-            >
-              연주 영상
-            </button>
+                {app.sessionTitle}
+                {!app.isUnlocked && (
+                  <span className="ml-1.5 text-xs opacity-60">🔒</span>
+                )}
+              </button>
+            ))}
           </div>
 
-          {/* 평가 결과 */}
-          {tab === "evaluations" && selectedApp && (
-            <div>
-              {selectedApp.evaluations.length === 0 ? (
-                <p className="text-gray-500 text-center py-12">
-                  아직 등록된 평가가 없습니다.
-                </p>
+          {selectedApp && (
+            <>
+              {/* ── 결과 잠김 상태 ── */}
+              {!selectedApp.isUnlocked ? (
+                <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-6 py-12 text-center">
+                  <p className="text-3xl mb-3">🔒</p>
+                  <p className="text-base font-medium text-neutral-700">
+                    아직 결과가 공개되지 않았습니다
+                  </p>
+                  <p className="mt-2 text-sm text-neutral-400">
+                    평가가 완료되면 이메일로 알려드립니다.
+                  </p>
+                </div>
               ) : (
-                <div className="flex flex-col gap-4">
-                  {selectedApp.evaluations.map((ev) => (
-                    <div key={ev.id} className="border rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="font-medium">
-                          {ev.evaluator.name} 선생님
-                        </span>
-                        <span className="text-lg font-bold">
-                          {getTotalScore(ev)} / {getMaxTotal(ev)}점
-                        </span>
-                      </div>
+                <>
+                  {/* ── 관리자 종합 코멘트 ── */}
+                  {selectedApp.adminSummary && (
+                    <div className="mb-6 rounded-xl border border-blue-100 bg-blue-50 px-5 py-4">
+                      <p className="text-xs font-medium text-blue-500 mb-1">
+                        종합 코멘트
+                      </p>
+                      <p className="text-sm text-neutral-800 whitespace-pre-wrap">
+                        {selectedApp.adminSummary}
+                      </p>
+                    </div>
+                  )}
 
-                      <div className="grid grid-cols-2 gap-2 mb-3">
-                        {ev.scores.map((s) => (
+                  {/* ── 탭 ── */}
+                  <div className="flex gap-1 mb-6 border-b border-neutral-200">
+                    {(["evaluations", "videos"] as const).map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => setTab(t)}
+                        className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
+                          tab === t
+                            ? "border-neutral-900 text-neutral-900"
+                            : "border-transparent text-neutral-400 hover:text-neutral-600"
+                        }`}
+                      >
+                        {t === "evaluations" ? "평가 결과" : "연주 영상"}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* ── 평가 결과 탭 ── */}
+                  {tab === "evaluations" && (
+                    <div className="space-y-4">
+                      {selectedApp.evaluations.length === 0 ? (
+                        <p className="text-gray-500 text-center py-8">
+                          아직 평가 결과가 없습니다.
+                        </p>
+                      ) : (
+                        selectedApp.evaluations.map((ev) => (
                           <div
-                            key={s.criteriaId}
-                            className="bg-gray-50 rounded p-2 flex items-center justify-between"
+                            key={ev.id}
+                            className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm"
                           >
-                            <span className="text-sm text-gray-600">
-                              {s.criteria.name}
-                            </span>
-                            <span className="text-sm font-bold">
-                              {s.score}/{s.criteria.maxScore}
-                            </span>
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="text-sm font-medium text-neutral-700">
+                                {ev.evaluator.name} 선생님
+                              </span>
+                              <span className="text-sm font-semibold text-neutral-900">
+                                {getTotalScore(ev)} / {getMaxTotal(ev)}점
+                              </span>
+                            </div>
+
+                            {ev.scores.length > 0 && (
+                              <div className="space-y-2 mb-3">
+                                {ev.scores.map((s) => (
+                                  <div
+                                    key={s.criteriaId}
+                                    className="flex items-center gap-3"
+                                  >
+                                    <span className="w-20 text-xs text-neutral-500 shrink-0">
+                                      {s.criteria.name}
+                                    </span>
+                                    <div className="flex-1 h-1.5 rounded-full bg-neutral-100">
+                                      <div
+                                        className="h-1.5 rounded-full bg-neutral-900 transition-all"
+                                        style={{
+                                          width: `${(s.score / s.criteria.maxScore) * 100}%`,
+                                        }}
+                                      />
+                                    </div>
+                                    <span className="text-xs text-neutral-600 shrink-0">
+                                      {s.score}/{s.criteria.maxScore}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {ev.comment && (
+                              <p className="text-sm text-neutral-600 bg-neutral-50 rounded-xl px-4 py-3 mt-2">
+                                {ev.comment}
+                              </p>
+                            )}
                           </div>
-                        ))}
-                      </div>
-
-                      <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
-                        <div
-                          className="bg-black rounded-full h-2 transition-all"
-                          style={{
-                            width: `${
-                              getMaxTotal(ev) > 0
-                                ? (getTotalScore(ev) / getMaxTotal(ev)) * 100
-                                : 0
-                            }%`,
-                          }}
-                        />
-                      </div>
-
-                      {ev.comment && (
-                        <div className="border-t pt-3">
-                          <p className="text-xs text-gray-400 mb-1">코멘트</p>
-                          <p className="text-gray-600 text-sm">{ev.comment}</p>
-                        </div>
+                        ))
                       )}
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+                  )}
 
-          {/* 연주 영상 */}
-          {tab === "videos" && selectedApp && (
-            <div>
-              {selectedApp.videos.length === 0 ? (
-                <p className="text-gray-500 text-center py-12">
-                  아직 등록된 영상이 없습니다.
-                </p>
-              ) : (
-                <div className="flex flex-col gap-6">
-                  {selectedApp.videos.map((video) => {
-                    const embedUrl = getYoutubeEmbedUrl(video.youtubeUrl);
-                    return (
-                      <div key={video.id} className="border rounded-lg p-4">
-                        {video.title && (
-                          <h3 className="font-medium mb-3">{video.title}</h3>
-                        )}
-                        {embedUrl && (
-                          <div className="aspect-video mb-3">
-                            <iframe
-                              src={embedUrl}
-                              className="w-full h-full rounded"
-                              allowFullScreen
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            />
-                          </div>
-                        )}
-                        <a
-                          href={video.youtubeUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 text-sm hover:underline"
-                        >
-                          YouTube에서 보기 →
-                        </a>
-                      </div>
-                    );
-                  })}
-                </div>
+                  {/* ── 연주 영상 탭 ── */}
+                  {tab === "videos" && (
+                    <div className="space-y-6">
+                      {selectedApp.videos.length === 0 ? (
+                        <p className="text-gray-500 text-center py-8">
+                          등록된 영상이 없습니다.
+                        </p>
+                      ) : (
+                        selectedApp.videos.map((v) => {
+                          const embedUrl = getYoutubeEmbedUrl(v.youtubeUrl);
+                          return (
+                            <div key={v.id} className="rounded-2xl border border-neutral-200 overflow-hidden">
+                              {embedUrl ? (
+                                <div className="aspect-video w-full">
+                                  <iframe
+                                    src={embedUrl}
+                                    className="w-full h-full"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                  />
+                                </div>
+                              ) : null}
+                              <div className="px-4 py-3 flex items-center justify-between bg-white">
+                                <span className="text-sm text-neutral-700">
+                                  {v.title || "연주 영상"}
+                                </span>
+                                <a
+                                  href={v.youtubeUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-blue-500 hover:underline"
+                                >
+                                  YouTube에서 보기 ↗
+                                </a>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  )}
+                </>
               )}
-            </div>
+            </>
           )}
         </>
       )}

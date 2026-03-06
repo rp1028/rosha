@@ -25,7 +25,7 @@ export async function GET(
   }
 }
 
-// PATCH: 회차 수정 (상태 변경 포함)
+// PATCH: 회차 수정 (제목, 날짜, 신청기간, 상태, 평가항목(신청 0명일 때만))
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -39,13 +39,86 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
-    const session = await prisma.session.update({
+    const session = await prisma.session.findUnique({
       where: { id },
-      data: body,
+      include: {
+        _count: { select: { applications: true } },
+        criteria: true,
+      },
     });
 
-    return apiSuccess(session);
-  } catch {
+    if (!session) return apiError("회차를 찾을 수 없습니다.", 404);
+
+    const {
+      title,
+      description,
+      date,
+      registrationStart,
+      registrationEnd,
+      status,
+      criteria,
+    } = body;
+
+    const updateData: Parameters<typeof prisma.session.update>[0]["data"] = {};
+
+    if (title !== undefined) updateData.title = String(title);
+    if (description !== undefined)
+      updateData.description = description === "" ? null : String(description);
+    if (date !== undefined) updateData.date = new Date(date);
+    if (registrationStart !== undefined)
+      updateData.registrationStart =
+        registrationStart === "" ? null : new Date(registrationStart);
+    if (registrationEnd !== undefined)
+      updateData.registrationEnd =
+        registrationEnd === "" ? null : new Date(registrationEnd);
+    if (status !== undefined && ["RECRUITING", "IN_PROGRESS", "COMPLETED"].includes(status))
+      updateData.status = status;
+
+    if (criteria !== undefined && Array.isArray(criteria)) {
+      if (session._count.applications > 0) {
+        return apiError(
+          "이미 신청이 있어 평가 항목은 수정할 수 없습니다. 제목·날짜·신청기간·상태만 수정됩니다.",
+          400
+        );
+      }
+      const validCriteria = criteria.filter(
+        (c: { name?: string }) => c && String(c.name).trim()
+      );
+      if (validCriteria.length === 0) {
+        return apiError("평가 항목을 최소 1개 이상 입력해주세요.", 400);
+      }
+
+      await prisma.$transaction(async (tx) => {
+        await tx.session.update({
+          where: { id },
+          data: updateData,
+        });
+        await tx.evaluationCriteria.deleteMany({ where: { sessionId: id } });
+        await tx.evaluationCriteria.createMany({
+          data: validCriteria.map(
+            (c: { name: string; maxScore?: number }, i: number) => ({
+              sessionId: id,
+              name: String(c.name).trim(),
+              maxScore: Number(c.maxScore) || 10,
+              order: i,
+            })
+          ),
+        });
+      });
+    } else {
+      await prisma.session.update({
+        where: { id },
+        data: updateData,
+      });
+    }
+
+    const updated = await prisma.session.findUnique({
+      where: { id },
+      include: { criteria: { orderBy: { order: "asc" } } },
+    });
+    return apiSuccess(updated);
+  } catch (e) {
+    console.error(e);
     return apiError("회차 수정에 실패했습니다.", 500);
   }
 }

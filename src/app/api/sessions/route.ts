@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 }
 
 // POST: 관리자 전용 - 회차 생성 (평가 항목 포함)
-// Body: { title, description, date, criteria: [{ name, maxScore }] }
+// Body: { title, description, date, registrationStart, registrationEnd, criteria: [{ name, maxScore }] }
 export async function POST(request: Request) {
   try {
     const auth = await getSession();
@@ -32,7 +32,9 @@ export async function POST(request: Request) {
       return apiError("권한이 없습니다.", 401);
     }
 
-    const { title, description, date, criteria } = await request.json();
+    const { title, description, date, registrationStart, registrationEnd, criteria } =
+      await request.json();
+
     if (!title || !date) {
       return apiError("제목과 날짜는 필수입니다.");
     }
@@ -42,6 +44,8 @@ export async function POST(request: Request) {
         title,
         description,
         date: new Date(date),
+        registrationStart: registrationStart ? new Date(registrationStart) : null,
+        registrationEnd: registrationEnd ? new Date(registrationEnd) : null,
         criteria: criteria?.length
           ? {
               create: criteria.map(

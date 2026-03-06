@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 type Session = {
   id: string;
@@ -17,6 +18,7 @@ type SuccessData = {
 };
 
 export default function ApplyPage() {
+  const searchParams = useSearchParams();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<SuccessData | null>(null);
@@ -38,10 +40,20 @@ export default function ApplyPage() {
 
   useEffect(() => {
     fetch("/api/sessions?public=true")
-      .then((res) => res.json())
-      .then(setSessions)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data: Session[]) => {
+        setSessions(data);
+
+        const sessionIdFromQuery = searchParams?.get("sessionId");
+        if (
+          sessionIdFromQuery &&
+          data.some((s) => s.id === sessionIdFromQuery)
+        ) {
+          setForm((prev) => ({ ...prev, sessionId: sessionIdFromQuery }));
+        }
+      })
       .catch(() => {});
-  }, []);
+  }, [searchParams]);
 
   // 전화번호: 숫자만 허용, 최대 11자리
   const handlePhoneChange = (value: string) => {
@@ -212,7 +224,7 @@ export default function ApplyPage() {
   }
 
   return (
-    <div className="h-screen bg-white flex flex-col items-center justify-center px-4 py-6">
+    <div className="min-h-screen bg-white flex flex-col items-center px-4 py-10">
       <div className="w-full max-w-xl">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-semibold text-neutral-900">입시평가회 신청</h1>

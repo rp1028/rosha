@@ -38,7 +38,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fefbf5] flex flex-col items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 py-8">
       <div className="w-full max-w-3xl">
         <div className="mb-12 text-center">
           <p className="text-3xl font-semibold tracking-[0.18em] text-[#3f302d]">

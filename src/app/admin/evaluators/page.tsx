@@ -94,15 +94,16 @@ export default function EvaluatorsPage() {
   return (
     <div className="min-h-screen bg-white px-4 py-10">
       <div className="mx-auto w-full max-w-4xl">
-        <div className="mb-8 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <Link
               href="/admin/dashboard"
-              className="text-xs text-neutral-400 hover:text-neutral-600"
+              className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
             >
               ← 대시보드
             </Link>
-            <h1 className="text-xl font-semibold text-neutral-900">
+            <span className="text-xs text-neutral-300">•</span>
+            <h1 className="text-sm font-semibold text-neutral-800">
               평가자 관리
             </h1>
           </div>
