@@ -87,21 +87,6 @@ export default function VideosPage() {
   return (
     <div className="min-h-screen bg-white px-4 py-10">
       <div className="mx-auto w-full max-w-4xl">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link
-              href="/admin/dashboard"
-              className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
-            >
-              ← 대시보드
-            </Link>
-            <span className="text-xs text-neutral-300">•</span>
-            <h1 className="text-sm font-semibold text-neutral-800">
-              영상 관리
-            </h1>
-          </div>
-        </div>
-
         <section className="mb-6 rounded-xl border border-neutral-200 bg-white px-4 py-4 shadow-sm">
           <label className="block text-sm font-medium text-neutral-800">
             회차 선택

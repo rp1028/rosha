@@ -114,21 +114,6 @@ export default function EmailLoginPage() {
   return (
     <div className="min-h-screen bg-white px-4 py-10">
       <div className="mx-auto w-full max-w-4xl">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link
-              href="/admin/dashboard"
-              className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
-            >
-              ← 대시보드
-            </Link>
-            <span className="text-xs text-neutral-300">•</span>
-            <h1 className="text-sm font-semibold text-neutral-800">
-              로그인 정보 발송
-            </h1>
-          </div>
-        </div>
-
         <section className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-4">
           <p className="text-sm font-medium text-amber-900">
             로그인 정보 재발송

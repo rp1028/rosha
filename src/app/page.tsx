@@ -1,13 +1,55 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function Home() {
+  const [showSplash, setShowSplash] = useState(true);
+  const [hideSplash, setHideSplash] = useState(false);
+
+  useEffect(() => {
+    const fadeTimer = setTimeout(() => {
+      setHideSplash(true);
+    }, 2500);
+
+    const removeTimer = setTimeout(() => {
+      setShowSplash(false);
+    }, 3500);
+
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(removeTimer);
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md text-center">
-        <h1 className="text-3xl sm:text-4xl font-semibold tracking-[0.15em] text-neutral-900">
+    <div className="relative min-h-screen bg-white flex flex-col items-center justify-center px-4 py-12 overflow-hidden">
+      {showSplash && (
+        <div
+          className={`fixed inset-0 z-30 flex items-center justify-center bg-white transition-opacity duration-800 ease-in-out ${
+            hideSplash ? "opacity-0 pointer-events-none" : "opacity-100"
+          }`}
+        >
+          <div className="flex flex-col items-center gap-3">
+            <h1 className="text-4xl sm:text-5xl font-semibold tracking-[0.18em] text-neutral-900">
+              ROSHA 입시평가회
+            </h1>
+            <p className="mt-2 text-base text-neutral-500">
+              음악 입시평가회 온라인 시스템
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div
+        className={`w-full max-w-md text-center relative z-10 transition-opacity duration-700 ease-out ${
+          hideSplash ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <h1 className="text-3xl sm:text-4xl font-semibold tracking-[0.18em] text-neutral-900">
           ROSHA 입시평가회
         </h1>
-        <p className="mt-3 text-sm text-neutral-500">
+        <p className="mt-3 text-base text-neutral-500">
           음악 입시평가회 온라인 시스템
         </p>
 
@@ -23,12 +65,6 @@ export default function Home() {
             className="h-11 w-full rounded-xl border border-neutral-300 text-sm text-neutral-900 text-center leading-11 hover:bg-neutral-50 transition"
           >
             학생 로그인
-          </Link>
-          <Link
-            href="/admin/login"
-            className="mt-3 text-xs text-neutral-500 hover:text-neutral-700 transition"
-          >
-            관리자 로그인
           </Link>
         </div>
       </div>

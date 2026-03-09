@@ -78,24 +78,9 @@ export default function EvaluatePage() {
   return (
     <div className="min-h-screen bg-white px-4 py-10">
       <div className="mx-auto w-full max-w-4xl">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link
-              href="/admin/dashboard"
-              className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
-            >
-              ← 대시보드
-            </Link>
-            <span className="text-xs text-neutral-300">•</span>
-            <h1 className="text-sm font-semibold text-neutral-800">
-              평가하기
-            </h1>
-          </div>
-        </div>
-
         {/* 회차 선택 */}
-        <section className="mb-8 rounded-xl border border-neutral-200 bg-white px-4 py-4 shadow-sm">
-          <label className="block text-sm font-medium text-neutral-800">
+        <section className="mb-5 rounded-xl border border-neutral-200 bg-white px-4 py-3 shadow-sm">
+          <label className="block text-[12px] font-medium text-neutral-800">
             회차 선택
           </label>
           <select
@@ -103,7 +88,7 @@ export default function EvaluatePage() {
             onChange={(e) => {
               setSelectedSession(e.target.value);
             }}
-            className="mt-3 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+            className="mt-2 h-7 w-full max-w-xs rounded-md border border-neutral-300 bg-white px-2 text-[11px] leading-none text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900/10"
           >
             <option value="">선택해주세요</option>
             {sessions.map((s) => (

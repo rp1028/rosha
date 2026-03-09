@@ -249,19 +249,7 @@ export default function SessionsPage() {
   return (
     <div className="min-h-screen bg-white px-4 py-10">
       <div className="mx-auto w-full max-w-4xl">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link
-              href="/admin/dashboard"
-              className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
-            >
-              ← 대시보드
-            </Link>
-            <span className="text-xs text-neutral-300">•</span>
-            <h1 className="text-sm font-semibold text-neutral-800">
-              회차 관리
-            </h1>
-          </div>
+        <div className="mb-4 flex justify-end">
           <button
             onClick={() => setShowForm(!showForm)}
             className="h-9 rounded-xl bg-black px-4 text-xs font-medium text-white transition hover:bg-neutral-800"
