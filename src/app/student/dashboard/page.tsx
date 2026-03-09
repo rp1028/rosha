@@ -111,6 +111,9 @@ export default function StudentDashboard() {
   const getMaxTotal = (ev: Evaluation) =>
     ev.scores.reduce((sum, s) => sum + s.criteria.maxScore, 0);
 
+  const isAfterOrOnDate = (dateStr: string) =>
+    new Date() >= new Date(dateStr);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -175,7 +178,7 @@ export default function StudentDashboard() {
 
       {/* ── 헤더 ── */}
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold">내 평가 결과</h1>
+        <h1 className="text-2xl font-bold">마이페이지</h1>
         <button
           onClick={handleLogout}
           className="text-gray-500 text-sm hover:text-gray-700"
@@ -206,7 +209,7 @@ export default function StudentDashboard() {
                 }`}
               >
                 {app.sessionTitle}
-                {!app.isUnlocked && (
+                {!app.isUnlocked && isAfterOrOnDate(app.sessionDate) && (
                   <span className="ml-1.5 text-xs opacity-60">🔒</span>
                 )}
               </button>
@@ -218,13 +221,28 @@ export default function StudentDashboard() {
               {/* ── 결과 잠김 상태 ── */}
               {!selectedApp.isUnlocked ? (
                 <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-6 py-12 text-center">
-                  <p className="text-3xl mb-3">🔒</p>
-                  <p className="text-base font-medium text-neutral-700">
-                    아직 결과가 공개되지 않았습니다
-                  </p>
-                  <p className="mt-2 text-sm text-neutral-400">
-                    평가가 완료되면 이메일로 알려드립니다.
-                  </p>
+                  {isAfterOrOnDate(selectedApp.sessionDate) && (
+                    <p className="text-3xl mb-3">🔒</p>
+                  )}
+                  {isAfterOrOnDate(selectedApp.sessionDate) ? (
+                    <>
+                      <p className="text-base font-medium text-neutral-700">
+                        아직 평가 결과가 공개되지 않았습니다.
+                      </p>
+                      <p className="mt-2 text-sm text-neutral-400">
+                        결과가 공개되면 이메일로 안내드릴게요.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-base font-medium text-neutral-700">
+                        신청이 정상적으로 완료되었습니다.
+                      </p>
+                      <p className="mt-2 text-sm text-neutral-400">
+                        평가일 이후 결과가 공개되며, 공개 시 이메일로 안내드립니다.
+                      </p>
+                    </>
+                  )}
                 </div>
               ) : (
                 <>

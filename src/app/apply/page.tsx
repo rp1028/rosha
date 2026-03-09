@@ -20,6 +20,7 @@ type SuccessData = {
 export default function ApplyPage() {
   const searchParams = useSearchParams();
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [sessionsLoading, setSessionsLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<SuccessData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +40,8 @@ export default function ApplyPage() {
   });
 
   useEffect(() => {
+    setSessionsLoading(true);
+
     fetch("/api/sessions?public=true")
       .then((res) => (res.ok ? res.json() : []))
       .then((data: Session[]) => {
@@ -52,7 +55,10 @@ export default function ApplyPage() {
           setForm((prev) => ({ ...prev, sessionId: sessionIdFromQuery }));
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        setSessionsLoading(false);
+      });
   }, [searchParams]);
 
   // 전화번호: 숫자만 허용, 최대 11자리
@@ -213,7 +219,7 @@ export default function ApplyPage() {
             </Link>
             <Link
               href="/"
-              className="text-xs text-neutral-400 hover:text-neutral-600 underline underline-offset-2"
+              className="inline-flex items-center justify-center rounded-xl border border-neutral-200 bg-white px-6 py-2.5 text-sm text-neutral-600 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-800"
             >
               홈으로 돌아가기
             </Link>
@@ -245,7 +251,9 @@ export default function ApplyPage() {
               }
               required
               className={`w-full h-11 rounded-xl border bg-white px-3 text-sm text-neutral-900 focus:outline-none focus:ring-2 ${
-                sessions.length === 0
+                sessionsLoading
+                  ? "border-neutral-300 focus:border-neutral-800 focus:ring-neutral-800/10"
+                  : sessions.length === 0
                   ? "border-red-500 bg-red-50 focus:ring-red-200"
                   : "border-neutral-300 focus:border-neutral-800 focus:ring-neutral-800/10"
               }`}
@@ -257,7 +265,11 @@ export default function ApplyPage() {
                 </option>
               ))}
             </select>
-            {sessions.length === 0 ? (
+            {sessionsLoading ? (
+              <p className="mt-1 text-xs text-neutral-400">
+                회차 정보를 불러오는 중입니다.
+              </p>
+            ) : sessions.length === 0 ? (
               <p className="mt-1 text-xs text-red-500">
                 현재 접수 중인 회차가 없습니다. 일정 확인 후 다시 접속해 주시기 바랍니다.
               </p>
@@ -389,7 +401,7 @@ export default function ApplyPage() {
         <div className="mt-8 flex justify-center">
           <Link
             href="/"
-            className="text-xs text-neutral-400 hover:text-neutral-600 underline underline-offset-2"
+            className="inline-flex items-center justify-center rounded-xl border border-neutral-200 bg-white px-6 py-2.5 text-sm text-neutral-600 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-800"
           >
             홈으로 돌아가기
           </Link>

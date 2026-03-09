@@ -98,14 +98,8 @@ export default function AdminLoginPage() {
 
         <div className="mt-10 flex flex-col items-center gap-3">
           <Link
-            href="/student/login"
-            className="text-xs text-[#a29186] underline underline-offset-2"
-          >
-            학생 로그인 화면으로 돌아가기
-          </Link>
-          <Link
             href="/"
-            className="text-xs text-[#a29186] underline underline-offset-2"
+            className="inline-flex items-center justify-center rounded-xl border border-neutral-200 bg-white px-6 py-2.5 text-sm text-neutral-600 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-800"
           >
             홈으로 돌아가기
           </Link>

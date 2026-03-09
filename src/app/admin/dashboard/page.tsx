@@ -31,6 +31,12 @@ export default function AdminDashboard() {
   // 관리자 전용 메뉴
   const adminMenuItems = [
     {
+      title: "신청 현황 / 통계",
+      description: "회차별 신청 데이터를 조회하고 엑셀로 내보냅니다.",
+      href: "/admin/applications",
+      icon: "📊",
+    },
+    {
       title: "회차 관리",
       description: "입시평가회 회차를 생성하고 관리합니다.",
       href: "/admin/sessions",
@@ -61,14 +67,14 @@ export default function AdminDashboard() {
       icon: "🎼",
     },
     {
-      title: "학생 결과 이메일 발송",
+      title: "학생 결과 발송",
       description: "평가 결과 열람 안내 이메일을 발송합니다.",
       href: "/admin/email/result",
       icon: "📨",
     },
     {
-      title: "로그인 정보 발송",
-      description: "학생에게 로그인 정보 이메일을 재발송합니다.",
+      title: "정보 발송",
+      description: "고유번호·비밀번호 등 로그인 정보를 재발송합니다.",
       href: "/admin/email/login",
       icon: "📧",
     },

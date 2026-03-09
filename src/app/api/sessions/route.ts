@@ -9,8 +9,19 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const isPublic = searchParams.get("public") === "true";
 
+    // 오늘(서버 기준) 0시 기준으로 이미 지난 회차는 공개용 목록에서 제외
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     const sessions = await prisma.session.findMany({
-      where: isPublic ? { status: "RECRUITING" } : undefined,
+      where: isPublic
+        ? {
+            status: "RECRUITING",
+            date: {
+              gte: today,
+            },
+          }
+        : undefined,
       include: {
         _count: { select: { applications: true } },
         criteria: { orderBy: { order: "asc" } },

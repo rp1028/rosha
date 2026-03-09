@@ -7,8 +7,8 @@ import { apiError, apiSuccess } from "@/lib/utils";
  * 학생 로그인 시 팝업에 표시할 다음 회차 정보 반환
  *
  * 팝업 노출 조건:
- * - 현재 시각이 (session.date - 10일) ~ session.registrationEnd 사이
- * - 해당 기간에 해당하는 회차가 있으면 반환, 없으면 null
+ * - 현재 시각이 session.registrationEnd 이전 (시작 제한 없음)
+ * - 이미 신청한 학생에게는 미표시
  */
 export async function GET() {
   try {
@@ -34,31 +34,27 @@ export async function GET() {
       orderBy: { date: "asc" },
     });
 
-    // 팝업 노출 기간에 해당하는 회차 찾기
-    // popupStart = examDate - 10일, popupEnd = registrationEnd
-    const candidateSession = sessions.find((s) => {
-      const popupStart = new Date(s.date);
-      popupStart.setDate(popupStart.getDate() - 10);
+    // 팝업 노출: 마감일 이전이면서, 아직 신청하지 않은 회차 중 가장 가까운 것
+    let candidateSession = null;
+    for (const s of sessions) {
       const popupEnd = new Date(s.registrationEnd!);
+      if (now > popupEnd) continue;
 
-      return now >= popupStart && now <= popupEnd;
-    });
-
-    if (!candidateSession) {
-      return apiSuccess(null);
+      const existingApplication = await prisma.application.findUnique({
+        where: {
+          studentId_sessionId: {
+            studentId: auth.id,
+            sessionId: s.id,
+          },
+        },
+      });
+      if (!existingApplication) {
+        candidateSession = s;
+        break;
+      }
     }
 
-    // 이미 해당 회차를 신청한 학생이면 팝업 미표시
-    const existingApplication = await prisma.application.findUnique({
-      where: {
-        studentId_sessionId: {
-          studentId: auth.id,
-          sessionId: candidateSession.id,
-        },
-      },
-    });
-
-    if (existingApplication) {
+    if (!candidateSession) {
       return apiSuccess(null);
     }
 

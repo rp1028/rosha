@@ -117,10 +117,10 @@ export default function EmailLoginPage() {
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Link
-              href="/admin/email"
+              href="/admin/dashboard"
               className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
             >
-              ← 이메일 관리
+              ← 대시보드
             </Link>
             <span className="text-xs text-neutral-300">•</span>
             <h1 className="text-sm font-semibold text-neutral-800">
