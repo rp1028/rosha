@@ -261,7 +261,7 @@ export default function SessionsPage() {
         {showForm && (
           <form
             onSubmit={handleCreate}
-            className="mb-8 rounded-xl border border-neutral-200 bg-white px-5 py-5 shadow-sm"
+            className="mb-8 rounded-xl border border-transparent bg-transparent px-5 py-5 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-100"
           >
             <h2 className="text-sm font-medium text-neutral-900">새 회차 생성</h2>
 
@@ -376,7 +376,7 @@ export default function SessionsPage() {
         {editingSession && (
           <form
             onSubmit={handleEditSubmit}
-            className="mb-8 rounded-xl border border-neutral-200 bg-white px-5 py-5 shadow-sm"
+            className="mb-8 rounded-xl border border-transparent bg-transparent px-5 py-5 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-100"
           >
             <h2 className="text-sm font-medium text-neutral-900">
               회차 수정: {editingSession.title}
@@ -534,7 +534,7 @@ export default function SessionsPage() {
           {sessions.map((session) => (
             <div
               key={session.id}
-              className="rounded-xl border border-neutral-200 bg-white px-5 py-4 text-sm shadow-sm"
+              className="rounded-xl border border-transparent bg-transparent px-5 py-4 text-sm shadow-sm transition hover:border-neutral-300 hover:bg-neutral-100"
             >
               <div className="mb-1 flex items-center justify-between">
                 <h2 className="text-sm font-medium text-neutral-900">
@@ -601,7 +601,7 @@ export default function SessionsPage() {
                 <select
                   value={session.status}
                   onChange={(e) => handleStatusChange(session.id, e.target.value)}
-                  className="h-8 rounded-lg border border-neutral-200 bg-white px-2 text-xs text-neutral-700 focus:outline-none"
+                  className="h-8 rounded-lg border border-transparent bg-transparent px-2 text-xs text-neutral-700 transition hover:border-neutral-300 focus:border-neutral-900 focus:outline-none"
                 >
                   {Object.entries(STATUS_LABEL).map(([value, label]) => (
                     <option key={value} value={value}>
@@ -612,13 +612,13 @@ export default function SessionsPage() {
                 <button
                   type="button"
                   onClick={() => startEdit(session)}
-                  className="h-8 rounded-lg border border-neutral-200 px-3 text-xs text-neutral-600 hover:bg-neutral-50"
+                  className="h-8 rounded-lg border border-transparent bg-transparent px-3 text-xs text-neutral-600 transition hover:border-neutral-300 hover:bg-neutral-100"
                 >
                   수정
                 </button>
                 <button
                   onClick={() => handleDelete(session)}
-                  className="h-8 rounded-lg border border-red-200 px-3 text-xs text-red-400 hover:bg-red-50 hover:text-red-600"
+                  className="h-8 rounded-lg border border-red-200 bg-transparent px-3 text-xs text-red-400 transition hover:bg-red-50 hover:text-red-600"
                 >
                   삭제
                 </button>

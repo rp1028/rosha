@@ -87,14 +87,14 @@ export default function VideosPage() {
   return (
     <div className="min-h-screen bg-white px-4 py-10">
       <div className="mx-auto w-full max-w-4xl">
-        <section className="mb-6 rounded-xl border border-neutral-200 bg-white px-4 py-4 shadow-sm">
-          <label className="block text-sm font-medium text-neutral-800">
+        <section className="mb-6 rounded-xl border border-transparent bg-transparent px-4 py-4 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-100">
+          <label className="block text-[12px] font-medium text-neutral-800">
             회차 선택
           </label>
           <select
             value={selectedSession}
             onChange={(e) => setSelectedSession(e.target.value)}
-            className="mt-3 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+            className="mt-2 h-6 w-full md:max-w-sm rounded-md border border-neutral-300 bg-white px-2 text-[11px] leading-none text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900/10"
           >
             <option value="">선택해주세요</option>
             {sessions.map((s) => (
@@ -109,7 +109,7 @@ export default function VideosPage() {
           <>
             <form
               onSubmit={handleSubmit}
-              className="mb-8 rounded-xl border border-neutral-200 bg-white px-5 py-5 text-sm shadow-sm"
+              className="mb-8 rounded-xl border border-transparent bg-transparent px-5 py-5 text-sm shadow-sm transition hover:border-neutral-300 hover:bg-neutral-100"
             >
               <h2 className="text-sm font-medium text-neutral-900">
                 영상 등록
@@ -185,7 +185,7 @@ export default function VideosPage() {
                 {videos.map((video) => (
                   <div
                     key={video.id}
-                    className="rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm shadow-sm"
+                    className="rounded-xl border border-transparent bg-transparent px-4 py-3 text-sm shadow-sm transition hover:border-neutral-300 hover:bg-neutral-100"
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-neutral-900">

@@ -79,7 +79,7 @@ export default function EvaluatePage() {
     <div className="min-h-screen bg-white px-4 py-10">
       <div className="mx-auto w-full max-w-4xl">
         {/* 회차 선택 */}
-        <section className="mb-5 rounded-xl border border-neutral-200 bg-white px-4 py-3 shadow-sm">
+        <section className="mb-6 rounded-xl border border-transparent bg-transparent px-4 py-4 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-100">
           <label className="block text-[12px] font-medium text-neutral-800">
             회차 선택
           </label>
@@ -88,7 +88,7 @@ export default function EvaluatePage() {
             onChange={(e) => {
               setSelectedSession(e.target.value);
             }}
-            className="mt-2 h-7 w-full max-w-xs rounded-md border border-neutral-300 bg-white px-2 text-[11px] leading-none text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900/10"
+            className="mt-2 h-6 w-full md:max-w-sm rounded-md border border-neutral-300 bg-white px-2 text-[11px] leading-none text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900/10"
           >
             <option value="">선택해주세요</option>
             {sessions.map((s) => (

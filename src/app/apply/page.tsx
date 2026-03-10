@@ -250,7 +250,7 @@ export default function ApplyPage() {
                 setForm({ ...form, sessionId: e.target.value })
               }
               required
-              className={`w-full h-11 rounded-xl border bg-white px-3 text-sm text-neutral-900 focus:outline-none focus:ring-2 ${
+              className={`w-full h-11 rounded-lg border bg-white px-3 text-sm text-neutral-900 focus:outline-none focus:ring-2 ${
                 sessionsLoading
                   ? "border-neutral-300 focus:border-neutral-800 focus:ring-neutral-800/10"
                   : sessions.length === 0
@@ -289,7 +289,7 @@ export default function ApplyPage() {
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               required
-              className="w-full h-11 rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-800/10"
+              className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-800/10"
             />
           </div>
 
@@ -307,7 +307,7 @@ export default function ApplyPage() {
               required
               maxLength={11}
               placeholder="01012345678"
-              className={`w-full h-11 rounded-xl border bg-white px-3 text-sm transition focus:outline-none focus:ring-2 ${
+              className={`w-full h-11 rounded-lg border bg-white px-3 text-sm transition focus:outline-none focus:ring-2 ${
                 isPhoneError
                   ? "border-red-500 bg-red-50 focus:ring-red-200"
                   : "border-neutral-300 focus:border-neutral-800 focus:ring-neutral-800/10"
@@ -336,7 +336,7 @@ export default function ApplyPage() {
               onBlur={() => setTouched({ ...touched, email: true })}
               required
               placeholder="example@email.com"
-              className={`w-full h-11 rounded-xl border bg-white px-3 text-sm transition focus:outline-none focus:ring-2 ${
+              className={`w-full h-11 rounded-lg border bg-white px-3 text-sm transition focus:outline-none focus:ring-2 ${
                 isEmailError
                   ? "border-red-500 bg-red-50 focus:ring-red-200"
                   : "border-neutral-300 focus:border-neutral-800 focus:ring-neutral-800/10"
@@ -362,7 +362,7 @@ export default function ApplyPage() {
               value={form.school}
               onChange={(e) => setForm({ ...form, school: e.target.value })}
               required
-              className="w-full h-11 rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-800/10"
+              className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-800/10"
             />
           </div>
 
@@ -377,7 +377,7 @@ export default function ApplyPage() {
                 setForm({ ...form, desiredUniv: e.target.value })
               }
               required
-              className="w-full h-11 rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-800/10"
+              className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-800/10"
             />
           </div>
 
@@ -391,7 +391,7 @@ export default function ApplyPage() {
             <button
               type="submit"
               disabled={loading}
-              className="h-11 w-full rounded-xl bg-black text-sm font-medium text-white hover:bg-neutral-800 transition disabled:cursor-not-allowed disabled:opacity-70"
+              className="h-11 w-full rounded-lg bg-black text-sm font-medium text-white hover:bg-neutral-800 transition disabled:cursor-not-allowed disabled:opacity-70"
             >
               {loading ? "신청 중..." : "신청하기"}
             </button>
@@ -401,7 +401,7 @@ export default function ApplyPage() {
         <div className="mt-8 flex justify-center">
           <Link
             href="/"
-            className="inline-flex items-center justify-center rounded-xl border border-neutral-200 bg-white px-6 py-2.5 text-sm text-neutral-600 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-800"
+            className="inline-flex items-center justify-center rounded-lg border border-neutral-200 bg-white px-6 py-2.5 text-sm text-neutral-600 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-800"
           >
             홈으로 돌아가기
           </Link>

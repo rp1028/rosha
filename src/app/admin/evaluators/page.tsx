@@ -168,7 +168,7 @@ export default function EvaluatorsPage() {
         ) : (
           <form
             onSubmit={handleCreate}
-            className="mb-8 rounded-xl border border-neutral-200 bg-white px-5 py-5 text-sm shadow-sm"
+            className="mb-8 rounded-xl border border-transparent bg-transparent px-5 py-5 text-sm shadow-sm transition hover:border-neutral-300 hover:bg-neutral-100"
           >
             <h2 className="text-sm font-medium text-neutral-900">
               새 평가자 계정
@@ -260,7 +260,7 @@ export default function EvaluatorsPage() {
         {editingEvaluator && (
           <form
             onSubmit={handleEditSubmit}
-            className="mb-8 rounded-xl border border-neutral-200 bg-white px-5 py-5 text-sm shadow-sm"
+            className="mb-8 rounded-xl border border-transparent bg-transparent px-5 py-5 text-sm shadow-sm transition hover:border-neutral-300 hover:bg-neutral-100"
           >
             <h2 className="text-sm font-medium text-neutral-900">
               평가자 수정: {editingEvaluator.name}
@@ -355,7 +355,7 @@ export default function EvaluatorsPage() {
             evaluators.map((ev) => (
               <div
                 key={ev.id}
-                className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-5 py-3 text-sm shadow-sm"
+                className="flex items-center justify-between rounded-xl border border-transparent bg-transparent px-5 py-3 text-sm shadow-sm transition hover:border-neutral-300 hover:bg-neutral-100"
               >
                 <div>
                   <div className="flex items-center gap-2">
@@ -382,7 +382,7 @@ export default function EvaluatorsPage() {
                     <button
                       type="button"
                       onClick={() => startEdit(ev)}
-                      className="h-8 rounded-lg border border-neutral-200 px-3 text-xs text-neutral-600 hover:bg-neutral-50"
+                      className="h-8 rounded-lg border border-transparent bg-transparent px-3 text-xs text-neutral-600 transition hover:border-neutral-300 hover:bg-neutral-100"
                     >
                       수정
                     </button>

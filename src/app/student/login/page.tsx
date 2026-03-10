@@ -282,8 +282,7 @@ export default function StudentLoginPage() {
               onChange={(e) => setUniqueCode(e.target.value)}
               required
               maxLength={6}
-              placeholder="260001"
-              className="h-11 w-full rounded-xl border border-[#cdbeb5] bg-white px-5 text-sm text-[#3f302d] placeholder:text-[#c2b3aa] shadow-[0_0_0_1px_rgba(0,0,0,0.02)] focus:border-[#5b4338] focus:outline-none focus:ring-2 focus:ring-[#5b4338]/20"
+              className="h-11 w-full rounded-xl border border-[#cdbeb5] bg-white px-5 text-sm text-[#3f302d] shadow-[0_0_0_1px_rgba(0,0,0,0.02)] focus:border-[#5b4338] focus:outline-none focus:ring-2 focus:ring-[#5b4338]/20"
             />
           </div>
 

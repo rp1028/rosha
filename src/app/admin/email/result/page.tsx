@@ -126,14 +126,23 @@ export default function EmailResultPage() {
   return (
     <div className="min-h-screen bg-white px-4 py-10">
       <div className="mx-auto w-full max-w-4xl">
-        <section className="mb-6 rounded-xl border border-neutral-200 bg-white px-4 py-4 shadow-sm">
-          <label className="block text-sm font-medium text-neutral-800">
+        <section className="mb-4 px-1">
+          <p className="text-sm font-medium text-neutral-900">
+            학생 결과 발송
+          </p>
+          <p className="mt-1 text-xs text-neutral-500">
+            선택한 회차의 학생들에게 평가 결과 열람 이메일을 발송합니다. 회차를 선택하면 대상 학생 목록이 표시됩니다.
+          </p>
+        </section>
+
+        <section className="mb-6 rounded-xl border border-transparent bg-transparent px-4 py-4 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-100">
+          <label className="block text-[12px] font-medium text-neutral-800">
             회차 선택
           </label>
           <select
             value={selectedSession}
             onChange={(e) => setSelectedSession(e.target.value)}
-            className="mt-3 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none"
+            className="mt-2 h-6 w-full md:max-w-sm rounded-md border border-neutral-300 bg-white px-2 text-[11px] leading-none text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900/10"
           >
             <option value="">선택해주세요</option>
             {sessions.map((s) => (
@@ -186,7 +195,7 @@ export default function EmailResultPage() {
               {applications.map((app) => (
                 <div
                   key={app.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm shadow-sm"
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-transparent bg-transparent px-4 py-3 text-sm shadow-sm transition hover:border-neutral-300 hover:bg-neutral-100"
                 >
                   <div>
                     <span className="font-medium text-neutral-900">

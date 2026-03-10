@@ -53,7 +53,7 @@ const adminMenuItems: MenuItem[] = [
     href: "/admin/email/result",
   },
   {
-    title: "정보 발송",
+    title: "학생 정보 발송",
     description: "고유번호·비밀번호 등 로그인 정보를 재발송합니다.",
     href: "/admin/email/login",
   },
@@ -113,23 +113,12 @@ export default function AdminLayout({
 
   return (
     <div className="min-h-screen bg-white flex">
-      <aside className="hidden md:flex md:w-64 lg:w-72 flex-col border-r border-neutral-200 bg-white px-6 py-6">
+      <aside className="hidden md:flex md:w-44 lg:w-52 flex-col border-r border-neutral-200 bg-white px-4 py-6">
         <div>
           <p className="text-[10px] font-medium tracking-[0.15em] text-neutral-400">
             ROSHA ADMIN
           </p>
-          <h1 className="mt-1 text-sm font-semibold text-neutral-900">
-            {isAdmin ? "관리자 대시보드" : "평가자 대시보드"}
-          </h1>
-          <p className="mt-1 text-[11px] text-neutral-500">
-            {user?.name}님, 환영합니다.
-          </p>
-          <Link
-            href="/"
-            className="mt-2 inline-flex items-center text-[11px] text-neutral-400 underline underline-offset-2 hover:text-neutral-700"
-          >
-            사이트 홈으로 가기
-          </Link>
+          <p className="mt-2 text-[11px] text-neutral-500">관리자님, 환영합니다.</p>
         </div>
 
         <nav className="mt-5 flex-1 space-y-2 overflow-y-auto pr-1 text-[13px]">
@@ -145,7 +134,7 @@ export default function AdminLayout({
                 className={`group flex items-start rounded-xl border px-3 py-2.5 text-left transition ${
                   isActive
                     ? "border-neutral-900 bg-neutral-900 text-white"
-                    : "border-neutral-200 bg-white text-neutral-900 hover:border-neutral-400 hover:bg-neutral-50"
+                    : "border-transparent bg-transparent text-neutral-800 hover:border-neutral-300 hover:bg-neutral-100"
                 }`}
               >
                 <div className="flex-1">
@@ -155,17 +144,35 @@ export default function AdminLayout({
             );
           })}
         </nav>
-
-        <button
-          onClick={handleLogout}
-          className="mt-4 self-start text-[10px] text-neutral-400 underline underline-offset-2 hover:text-neutral-700"
-        >
-          로그아웃
-        </button>
       </aside>
 
       <main className="flex-1 bg-neutral-50 px-4 py-6 md:px-12 md:py-8 overflow-y-auto">
-        <div className="mx-auto w-full max-w-7xl">{children}</div>
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="mb-4 flex items-center justify-end gap-2 text-[11px] text-neutral-500">
+            <Link
+              href="/"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-400 transition hover:border-neutral-400 hover:text-neutral-700 hover:bg-neutral-50"
+              aria-label="Home"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="h-4 w-4"
+              >
+                <path d="M10.707 1.293a1 1 0 0 0-1.414 0l-7 7A1 1 0 0 0 2 10h1v6a2 2 0 0 0 2 2h3.5a.5.5 0 0 0 .5-.5V13h2v4.5a.5.5 0 0 0 .5.5H15a2 2 0 0 0 2-2v-6h1a1 1 0 0 0 .707-1.707l-7-7Z" />
+              </svg>
+            </Link>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="rounded-full border border-neutral-200 bg-white px-3 py-1 text-[11px] font-medium text-neutral-500 transition hover:border-neutral-400 hover:text-neutral-800 hover:bg-neutral-50"
+            >
+              Logout
+            </button>
+          </div>
+          {children}
+        </div>
       </main>
     </div>
   );

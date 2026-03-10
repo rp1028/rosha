@@ -203,10 +203,30 @@ export default function ScoresPage() {
     }
   };
 
+  const handleClear = (id: string) => {
+    setSheetState((prev) => ({
+      ...prev,
+      [id]: {
+        ...(prev[id] || {
+          title: "",
+          url: "",
+          saving: false,
+          message: "",
+          error: "",
+          uploading: false,
+        }),
+        title: "",
+        url: "",
+        message: "",
+        error: "",
+      },
+    }));
+  };
+
   return (
     <div className="min-h-screen bg-white px-4 py-10">
       <div className="mx-auto w-full max-w-4xl">
-        <section className="mb-5 rounded-xl border border-neutral-200 bg-white px-4 py-3 shadow-sm">
+        <section className="mb-6 rounded-xl border border-transparent bg-transparent px-4 py-4 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-100">
           <label className="block text-[12px] font-medium text-neutral-800">
             회차 선택
           </label>
@@ -325,14 +345,24 @@ export default function ScoresPage() {
                           <span className="text-red-500">{state.error}</span>
                         )}
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleSave(app.id)}
-                        disabled={state?.saving}
-                        className="h-8 rounded-xl bg-black px-4 text-xs font-medium text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        {state?.saving ? "저장 중..." : "저장"}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleClear(app.id)}
+                          disabled={state?.saving}
+                          className="h-8 rounded-full border border-neutral-300 px-3 text-[11px] font-medium text-neutral-600 bg-white hover:bg-neutral-50 hover:border-neutral-400 disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          지우기
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSave(app.id)}
+                          disabled={state?.saving}
+                          className="h-8 rounded-xl bg-black px-4 text-xs font-medium text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {state?.saving ? "저장 중..." : "저장"}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
