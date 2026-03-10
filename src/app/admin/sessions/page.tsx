@@ -1,8 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Criteria = {
   id: string;
@@ -58,6 +67,7 @@ export default function SessionsPage() {
   });
   const [editCriteriaList, setEditCriteriaList] = useState<CriteriaInput[]>([]);
   const [editLoading, setEditLoading] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const fetchSessions = () => {
     fetch("/api/admin/sessions")
@@ -92,6 +102,11 @@ export default function SessionsPage() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!form.date) {
+      alert("평가 일자를 선택해주세요.");
+      return;
+    }
 
     const validCriteria = criteriaList.filter((c) => c.name.trim());
     if (validCriteria.length === 0) {
@@ -246,6 +261,49 @@ export default function SessionsPage() {
 
   const totalMaxScore = criteriaList.reduce((sum, c) => sum + c.maxScore, 0);
 
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 5 }, (_, i) =>
+    String(currentYear + i)
+  );
+  const monthOptions = Array.from({ length: 12 }, (_, i) =>
+    String(i + 1).padStart(2, "0")
+  );
+  const dayOptions = Array.from({ length: 31 }, (_, i) =>
+    String(i + 1).padStart(2, "0")
+  );
+
+  const [formDateParts, setFormDateParts] = useState({
+    year: "",
+    month: "",
+    day: "",
+  });
+
+  const { year: formYear, month: formMonth, day: formDay } = formDateParts;
+
+  const updateFormDate = (part: "year" | "month" | "day", value: string) => {
+    setFormDateParts((prev) => {
+      const nextYear = part === "year" ? value : prev.year;
+      const nextMonth = part === "month" ? value : prev.month;
+      const nextDay = part === "day" ? value : prev.day;
+
+      const nextDate =
+        nextYear && nextMonth && nextDay
+          ? `${nextYear}-${nextMonth}-${nextDay}`
+          : "";
+
+      setForm((prevForm) => ({
+        ...prevForm,
+        date: nextDate,
+      }));
+
+      return {
+        year: nextYear,
+        month: nextMonth,
+        day: nextDay,
+      };
+    });
+  };
+
   return (
     <div className="min-h-screen bg-white px-4 py-10">
       <div className="mx-auto w-full max-w-4xl">
@@ -261,7 +319,7 @@ export default function SessionsPage() {
         {showForm && (
           <form
             onSubmit={handleCreate}
-            className="mb-8 rounded-xl border border-transparent bg-transparent px-5 py-5 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-100"
+            className="mb-8 rounded-xl border border-neutral-200 bg-white px-5 py-5 shadow-sm transition hover:border-neutral-300"
           >
             <h2 className="text-sm font-medium text-neutral-900">새 회차 생성</h2>
 
@@ -275,7 +333,6 @@ export default function SessionsPage() {
                   type="text"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  placeholder="예: 2026년 3회차 입시평가회"
                   required
                   className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
                 />
@@ -286,16 +343,103 @@ export default function SessionsPage() {
                 <label className="block text-xs font-medium text-neutral-700">
                   평가 당일 <span className="text-red-400">*</span>
                 </label>
-                <input
-                  type="date"
-                  value={form.date}
-                  onChange={(e) => setForm({ ...form, date: e.target.value })}
-                  required
-                  className="mt-1 h-10 w-full rounded-xl border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
-                />
-                <p className="mt-1 text-[11px] text-neutral-400">
-                  신청 기간: 평가일 2주 전 ~ 1일 전 (자동 설정)
-                </p>
+                <div className="mt-1 flex flex-col gap-3 md:flex-row md:items-center md:gap-2">
+                  <div className="grid grid-cols-3 gap-3 md:max-w-md">
+                    <div className="space-y-1">
+                      <Select
+                        value={formYear}
+                        onValueChange={(value) => updateFormDate("year", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="YYYY" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {yearOptions.map((y) => (
+                            <SelectItem key={y} value={y}>
+                              {y}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <Select
+                        value={formMonth}
+                        onValueChange={(value) => updateFormDate("month", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="MM" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {monthOptions.map((m) => (
+                            <SelectItem key={m} value={m}>
+                              {m}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <Select
+                        value={formDay}
+                        onValueChange={(value) => updateFormDate("day", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="DD" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {dayOptions.map((d) => (
+                            <SelectItem key={d} value={d}>
+                              {d}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <button
+                      type="button"
+                      onClick={() => setIsCalendarOpen((prev) => !prev)}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-neutral-300 bg-white text-neutral-500 shadow-sm hover:border-neutral-400 hover:text-neutral-800 hover:bg-neutral-50"
+                      aria-label="달력 열기"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        className="h-4 w-4"
+                      >
+                        <path d="M6 2a.75.75 0 0 1 .75.75V4h6.5V2.75a.75.75 0 0 1 1.5 0V4h.5A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4h.5V2.75A.75.75 0 0 1 6 2Zm9.25 6.5h-10.5a1.25 1.25 0 0 0-1.25 1.25v5.5c0 .69.56 1.25 1.25 1.25h10.5A1.25 1.25 0 0 0 16.5 15.25v-5.5A1.25 1.25 0 0 0 15.25 8.5Z" />
+                      </svg>
+                    </button>
+                    {isCalendarOpen && (
+                      <div className="relative">
+                        <div className="absolute z-40 mt-2 w-[260px] rounded-md border border-neutral-200 bg-white p-2 shadow-lg">
+                          <DayPicker
+                            mode="single"
+                            showOutsideDays
+                            selected={form.date ? new Date(form.date) : undefined}
+                            onSelect={(date) => {
+                              if (!date) return;
+                              const y = String(date.getFullYear());
+                              const m = String(date.getMonth() + 1).padStart(
+                                2,
+                                "0"
+                              );
+                              const d = String(date.getDate()).padStart(2, "0");
+                              setFormDateParts({ year: y, month: m, day: d });
+                              setForm((prev) => ({
+                                ...prev,
+                                date: `${y}-${m}-${d}`,
+                              }));
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {/* 설명 */}
@@ -318,7 +462,7 @@ export default function SessionsPage() {
             <div className="mt-5">
               <div className="flex items-center justify-between mb-2">
                 <label className="text-xs font-medium text-neutral-700">
-                  평가 항목 (총 {totalMaxScore}점)
+                  평가 항목
                 </label>
                 <button
                   type="button"

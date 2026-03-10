@@ -265,11 +265,7 @@ export default function ApplyPage() {
                 </option>
               ))}
             </select>
-            {sessionsLoading ? (
-              <p className="mt-1 text-xs text-neutral-400">
-                회차 정보를 불러오는 중입니다.
-              </p>
-            ) : sessions.length === 0 ? (
+            {sessionsLoading ? null : sessions.length === 0 ? (
               <p className="mt-1 text-xs text-red-500">
                 현재 접수 중인 회차가 없습니다. 일정 확인 후 다시 접속해 주시기 바랍니다.
               </p>

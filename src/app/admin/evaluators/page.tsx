@@ -159,12 +159,14 @@ export default function EvaluatorsPage() {
 
         {/* 생성 버튼 / 폼 */}
         {!showForm ? (
-          <button
-            onClick={() => setShowForm(true)}
-            className="mb-6 h-9 rounded-xl bg-black px-4 text-xs font-medium text-white transition hover:bg-neutral-800"
-          >
-            + 평가자 계정 생성
-          </button>
+          <div className="mb-4 flex justify-end">
+            <button
+              onClick={() => setShowForm(true)}
+              className="h-9 rounded-xl bg-black px-4 text-xs font-medium text-white transition hover:bg-neutral-800"
+            >
+              + 평가자 계정 생성
+            </button>
+          </div>
         ) : (
           <form
             onSubmit={handleCreate}

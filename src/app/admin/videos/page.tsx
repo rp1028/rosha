@@ -3,6 +3,13 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Session = {
   id: string;
@@ -91,18 +98,23 @@ export default function VideosPage() {
           <label className="block text-[12px] font-medium text-neutral-800">
             회차 선택
           </label>
-          <select
-            value={selectedSession}
-            onChange={(e) => setSelectedSession(e.target.value)}
-            className="mt-2 h-6 w-full md:max-w-sm rounded-md border border-neutral-300 bg-white px-2 text-[11px] leading-none text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900/10"
-          >
-            <option value="">선택해주세요</option>
-            {sessions.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.title}
-              </option>
-            ))}
-          </select>
+          <div className="mt-2 w-full md:max-w-sm">
+            <Select
+              value={selectedSession}
+              onValueChange={(value) => setSelectedSession(value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="회차를 선택해주세요" />
+              </SelectTrigger>
+              <SelectContent>
+                {sessions.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    {s.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </section>
 
         {selectedSession && (

@@ -133,7 +133,7 @@ export default function AdminLayout({
                 href={item.href}
                 className={`group flex items-start rounded-xl border px-3 py-2.5 text-left transition ${
                   isActive
-                    ? "border-neutral-900 bg-neutral-900 text-white"
+                    ? "border-neutral-300 bg-neutral-50 text-neutral-900"
                     : "border-transparent bg-transparent text-neutral-800 hover:border-neutral-300 hover:bg-neutral-100"
                 }`}
               >
