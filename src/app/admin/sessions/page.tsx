@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DayPicker } from "react-day-picker";
-import "react-day-picker/dist/style.css";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -12,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
 
 type Criteria = {
   id: string;
@@ -415,10 +414,9 @@ export default function SessionsPage() {
                     </button>
                     {isCalendarOpen && (
                       <div className="relative">
-                        <div className="absolute z-40 mt-2 w-[260px] rounded-md border border-neutral-200 bg-white p-2 shadow-lg">
-                          <DayPicker
+                        <div className="absolute z-40 mt-2 w-[260px] rounded-md border border-neutral-200 bg-white shadow-lg">
+                          <Calendar
                             mode="single"
-                            showOutsideDays
                             selected={form.date ? new Date(form.date) : undefined}
                             onSelect={(date) => {
                               if (!date) return;
@@ -434,6 +432,7 @@ export default function SessionsPage() {
                                 date: `${y}-${m}-${d}`,
                               }));
                             }}
+                            className="text-xs"
                           />
                         </div>
                       </div>
