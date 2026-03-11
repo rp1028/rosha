@@ -67,6 +67,7 @@ export default function SessionsPage() {
   const [editCriteriaList, setEditCriteriaList] = useState<CriteriaInput[]>([]);
   const [editLoading, setEditLoading] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState<Date | undefined>(undefined);
 
   const fetchSessions = () => {
     fetch("/api/admin/sessions")
@@ -399,7 +400,12 @@ export default function SessionsPage() {
                   <div className="flex items-center">
                     <button
                       type="button"
-                      onClick={() => setIsCalendarOpen((prev) => !prev)}
+                      onClick={() => {
+                        setIsCalendarOpen((prev) => !prev);
+                        setCalendarMonth(
+                          form.date ? new Date(form.date) : new Date()
+                        );
+                      }}
                       className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-neutral-300 bg-white text-neutral-500 shadow-sm hover:border-neutral-400 hover:text-neutral-800 hover:bg-neutral-50"
                       aria-label="달력 열기"
                     >
@@ -414,9 +420,11 @@ export default function SessionsPage() {
                     </button>
                     {isCalendarOpen && (
                       <div className="relative">
-                        <div className="absolute z-40 mt-2 w-[260px] rounded-md border border-neutral-200 bg-white shadow-lg">
+                        <div className="absolute z-40 mt-2 w-[180px] rounded-md border border-neutral-200 bg-white shadow-lg">
                           <Calendar
                             mode="single"
+                            month={calendarMonth}
+                            onMonthChange={setCalendarMonth}
                             selected={form.date ? new Date(form.date) : undefined}
                             onSelect={(date) => {
                               if (!date) return;
@@ -432,7 +440,7 @@ export default function SessionsPage() {
                                 date: `${y}-${m}-${d}`,
                               }));
                             }}
-                            className="text-xs"
+                            className="text-[10px] [--cell-size:1.5rem]"
                           />
                         </div>
                       </div>
