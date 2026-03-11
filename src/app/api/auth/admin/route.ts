@@ -47,7 +47,8 @@ export async function POST(request: Request) {
         role: evaluator.role,
       },
     });
-  } catch {
+  } catch (e) {
+    console.error("ADMIN LOGIN ERROR", e);
     return apiError("로그인 처리 중 오류가 발생했습니다.", 500);
   }
 }
