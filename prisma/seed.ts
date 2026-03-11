@@ -53,29 +53,42 @@ async function main() {
   });
   console.log("✅ Teachers:", teacher1.loginId, teacher2.loginId);
 
-  // 테스트 회차
-  const session = await prisma.session.create({
-    data: {
-      title: "2026년 1회차 입시평가회",
-      description: "테스트 회차입니다",
-      date: new Date("2026-03-15"),
-      status: "RECRUITING",
-      criteria: {
-        create: [
-          { name: "음정", maxScore: 20, order: 0 },
-          { name: "리듬", maxScore: 20, order: 1 },
-          { name: "표현력", maxScore: 20, order: 2 },
-          { name: "테크닉", maxScore: 20, order: 3 },
-          { name: "무대매너", maxScore: 20, order: 4 },
-        ],
-      },
-    },
+  // 테스트 회차 (있으면 재사용, 없으면 생성)
+  const sessionTitle = "2026년 1회차 입시평가회";
+  let session = await prisma.session.findFirst({
+    where: { title: sessionTitle },
+    include: { criteria: true },
   });
+  if (!session) {
+    session = await prisma.session.create({
+      data: {
+        title: sessionTitle,
+        description: "테스트 회차입니다",
+        date: new Date("2026-03-15"),
+        status: "RECRUITING",
+        criteria: {
+          create: [
+            { name: "음정", maxScore: 20, order: 0 },
+            { name: "리듬", maxScore: 20, order: 1 },
+            { name: "표현력", maxScore: 20, order: 2 },
+            { name: "테크닉", maxScore: 20, order: 3 },
+            { name: "무대매너", maxScore: 20, order: 4 },
+          ],
+        },
+      },
+      include: { criteria: true },
+    });
+  }
+  if (!session) {
+    throw new Error("Seed failed: session not found or created");
+  }
   console.log("✅ Session:", session.title);
 
-  // 테스트 학생 (새 형식: 아이디 260001, 비밀번호 1234)
-  const student = await prisma.student.create({
-    data: {
+  // 테스트 학생 (아이디 260001, 비밀번호 1234) — 이미 있으면 업데이트만
+  const student = await prisma.student.upsert({
+    where: { uniqueCode: "260001" },
+    update: {},
+    create: {
       name: "홍길동",
       phone: "010-1234-5678",
       email: "test@gmail.com",
@@ -85,13 +98,19 @@ async function main() {
     },
   });
 
-  await prisma.application.create({
-    data: {
-      desiredUniv: "서울대학교",
-      studentId: student.id,
-      sessionId: session.id,
-    },
+  // 신청이 없으면 생성
+  const existingApp = await prisma.application.findFirst({
+    where: { studentId: student.id, sessionId: session.id },
   });
+  if (!existingApp) {
+    await prisma.application.create({
+      data: {
+        desiredUniv: "서울대학교",
+        studentId: student.id,
+        sessionId: session.id,
+      },
+    });
+  }
   console.log("✅ Student:", student.name, "→ 아이디:", student.uniqueCode, "/ 비밀번호: 1234");
 
   console.log("🎉 Seed complete!");

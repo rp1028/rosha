@@ -19,7 +19,7 @@
 
 ---
 
-## 프로젝트 구조
+## 프로젝트 구조  
 
 ```
 rosha/
@@ -179,6 +179,61 @@ npm run dev
 - **인증**: `POST /api/auth/student`, `POST /api/auth/admin`, `GET /api/auth/me`, `POST /api/auth/logout`  
 - **학생**: `GET /api/student/applications`, `GET /api/student/upcoming_session`, `POST /api/student/forgot-credentials`  
 - **관리/평가**: `/api/admin/*` (sessions, evaluators, students, applications, export, email 등), `/api/evaluations`, `/api/evaluator/annotations`, `/api/videos` 등  
+
+---
+
+## Vercel 배포
+
+### 1. 저장소 연결
+
+1. [Vercel](https://vercel.com) 로그인 후 **Add New** → **Project**
+2. GitHub/GitLab/Bitbucket에서 이 저장소 선택 후 **Import**
+3. **Framework Preset**: Next.js (자동 감지됨)
+
+### 2. 환경 변수 설정
+
+Vercel 대시보드 → 프로젝트 → **Settings** → **Environment Variables**에서 다음 변수를 추가하세요.
+
+| 변수명 | 필수 | 설명 |
+|--------|------|------|
+| `DATABASE_URL` | ✅ | PostgreSQL 연결 문자열 (Supabase 등). **Connection pooling** URL 사용 권장 (서버리스에서 연결 수 제한 대응) |
+| `JWT_SECRET` | ✅ | JWT 서명용 비밀 키 (32자 이상 랜덤 문자열 권장) |
+| `RESEND_API_KEY` | ✅ | Resend API 키 (이메일 발송용) |
+| `EMAIL_FROM` | | 발신 주소 (예: `ROSHA 입시평가회 <noreply@your-domain.com>`) |
+| `NEXT_PUBLIC_SITE_URL` | | 배포된 사이트 URL (예: `https://your-app.vercel.app`) — 이메일 링크 등에 사용 |
+
+**Supabase 사용 시**: Supabase 대시보드 → **Settings** → **Database** → **Connection string**에서 **URI** 또는 **Transaction** pooler URL을 복사해 `DATABASE_URL`로 넣으면 됩니다.
+
+### 3. DB 스키마 반영
+
+배포 전에 프로덕션 DB에 스키마를 적용해 두세요.
+
+```bash
+# 로컬에서 .env에 프로덕션 DATABASE_URL 설정 후
+npx prisma db push
+# 또는 마이그레이션 사용 시
+npx prisma migrate deploy
+```
+
+시드 데이터가 필요하면:
+
+```bash
+npm run db:seed
+```
+
+### 4. 배포
+
+- **Deploy** 클릭 후 빌드가 완료되면 배포 URL에서 확인할 수 있습니다.
+- `vercel.json`에 `prisma generate`가 빌드 단계에 포함되어 있어 별도 설정 없이 Prisma가 동작합니다.
+
+### 5. (선택) Google 시트 연동
+
+Google 시트 연동을 쓸 경우 Vercel 환경 변수에 다음을 추가하세요.
+
+- `GOOGLE_SERVICE_ACCOUNT_EMAIL`
+- `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`
+- `GOOGLE_SHEETS_SPREADSHEET_ID`
+- `GOOGLE_SHEETS_APPLICATION_SHEET_NAME` (선택)
 
 ---
 
