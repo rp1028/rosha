@@ -431,6 +431,7 @@ export default function SessionsPage() {
                                 ...prev,
                                 date: `${y}-${m}-${d}`,
                               }));
+                              setIsCalendarOpen(false);
                             }}
                             className="rounded-lg border"
                           />
