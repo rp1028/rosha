@@ -6,22 +6,23 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-/** 랜덤 비밀번호 생성 (영문+숫자 10자) */
+/** 랜덤 비밀번호 생성 (숫자 4자리) */
 export function generatePassword(): string {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+  const digits = "0123456789";
   let result = "";
-  for (let i = 0; i < 10; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  for (let i = 0; i < 4; i++) {
+    result += digits.charAt(Math.floor(Math.random() * digits.length));
   }
   return result;
 }
 
-/** DB에 없는 6자리 고유번호 생성 */
+/** DB에 없는 6자리 고유번호 생성 (연도 2자리 + 랜덤 4자리, 예: 26XXXX) */
 export async function generateUniqueCode(prisma: PrismaClient): Promise<string> {
+  const year2 = String(new Date().getFullYear()).slice(-2);
   const digits = "0123456789";
   for (let attempt = 0; attempt < 100; attempt++) {
-    let code = "";
-    for (let i = 0; i < 6; i++) {
+    let code = year2;
+    for (let i = 0; i < 4; i++) {
       code += digits.charAt(Math.floor(Math.random() * digits.length));
     }
     const existing = await prisma.student.findUnique({
