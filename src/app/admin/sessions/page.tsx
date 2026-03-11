@@ -442,6 +442,13 @@ export default function SessionsPage() {
                             }}
                             className="text-[10px] [--cell-size:1.5rem]"
                           />
+                          <button
+                            type="button"
+                            onClick={() => setIsCalendarOpen(false)}
+                            className="mx-2 mb-2 mt-1 w-[calc(100%-1rem)] rounded-md bg-black px-2 py-1 text-[11px] font-medium text-white hover:bg-neutral-800"
+                          >
+                            날짜 선택 완료
+                          </button>
                         </div>
                       </div>
                     )}
