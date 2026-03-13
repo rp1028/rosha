@@ -230,8 +230,8 @@ function ApplyPageInner() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center px-4 py-10">
-      <div className="w-full max-w-xl">
+    <div className="min-h-screen bg-neutral-50 flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-xl rounded-2xl border border-neutral-200 bg-white px-6 py-7 shadow-sm">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-semibold text-neutral-900">입시평가회 신청</h1>
           <p className="mt-2 text-sm text-neutral-500">
@@ -239,9 +239,9 @@ function ApplyPageInner() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2 text-neutral-800">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="space-y-1.5">
+            <label className="block text-xs font-medium text-neutral-800">
               회차 선택
             </label>
             <select
@@ -276,8 +276,8 @@ function ApplyPageInner() {
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1 text-neutral-800">
+          <div className="space-y-1.5">
+            <label className="block text-xs font-medium text-neutral-800">
               이름
             </label>
             <input
@@ -290,8 +290,8 @@ function ApplyPageInner() {
           </div>
 
           {/* 전화번호 */}
-          <div>
-            <label className="block text-sm font-medium mb-1 text-neutral-800">
+          <div className="space-y-1.5">
+            <label className="block text-xs font-medium text-neutral-800">
               전화번호
             </label>
             <input
@@ -321,8 +321,8 @@ function ApplyPageInner() {
           </div>
 
           {/* 이메일 */}
-          <div>
-            <label className="block text-sm font-medium mb-1 text-neutral-800">
+          <div className="space-y-1.5">
+            <label className="block text-xs font-medium text-neutral-800">
               이메일
             </label>
             <input
@@ -349,8 +349,8 @@ function ApplyPageInner() {
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1 text-neutral-800">
+          <div className="space-y-1.5">
+            <label className="block text-xs font-medium text-neutral-800">
               현재 학교
             </label>
             <input
@@ -362,8 +362,8 @@ function ApplyPageInner() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1 text-neutral-800">
+          <div className="space-y-1.5">
+            <label className="block text-xs font-medium text-neutral-800">
               희망 대학교
             </label>
             <input
@@ -394,7 +394,7 @@ function ApplyPageInner() {
           </div>
         </form>
 
-        <div className="mt-8 flex justify-center">
+        <div className="mt-7 flex justify-center">
           <Link
             href="/"
             className="inline-flex items-center justify-center rounded-lg border border-neutral-200 bg-white px-6 py-2.5 text-sm text-neutral-600 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-800"

@@ -345,19 +345,19 @@ export default function AdminApplicationsPage() {
     <div className="min-h-screen bg-white px-4 py-10">
       <div className="mx-auto w-full max-w-5xl">
         {/* 상단 내보내기 버튼 */}
-        <div className="mb-4 flex items-center justify-end">
+        <div className="mb-5 flex items-center justify-end border-b border-neutral-100 pb-3">
           <div className="flex gap-2 text-xs">
             <button
               type="button"
               onClick={handleExportToSheet}
-              className="inline-flex items-center rounded-full border border-transparent bg-transparent px-3 py-1 font-medium text-neutral-600 transition hover:border-neutral-300 hover:bg-neutral-100 hover:text-neutral-900"
+              className="inline-flex h-8 items-center rounded-full border border-neutral-300 bg-white px-3 text-xs font-medium text-neutral-600 shadow-sm transition hover:border-neutral-400 hover:bg-neutral-50 hover:text-neutral-900"
             >
               구글 시트로 내보내기
             </button>
             <button
               type="button"
               onClick={handleExportCsv}
-              className="inline-flex items-center rounded-full border border-transparent bg-transparent px-3 py-1 font-medium text-neutral-600 transition hover:border-neutral-300 hover:bg-neutral-100 hover:text-neutral-900"
+              className="inline-flex h-8 items-center rounded-full border border-neutral-300 bg-white px-3 text-xs font-medium text-neutral-600 shadow-sm transition hover:border-neutral-400 hover:bg-neutral-50 hover:text-neutral-900"
             >
               엑셀(CSV)로 내보내기
             </button>
@@ -365,14 +365,14 @@ export default function AdminApplicationsPage() {
         </div>
 
         {/* 보기 유형 선택 */}
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <div className="inline-flex rounded-xl bg-transparent p-1 text-xs">
             {viewModeOptions.map((opt) => (
               <button
                 key={opt.id}
                 type="button"
                 onClick={() => setViewMode(opt.id)}
-                className={`rounded-lg px-3 py-1.5 border-b border-transparent transition ${
+                className={`inline-flex h-8 items-center rounded-full border-b border-transparent px-3 text-xs transition ${
                   viewMode === opt.id
                     ? "border-neutral-900 text-neutral-900"
                     : "text-neutral-500 hover:border-neutral-300 hover:text-neutral-800"
@@ -382,59 +382,36 @@ export default function AdminApplicationsPage() {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* 회차 선택 + 검색 */}
+        <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <div className="w-full md:max-w-sm">
+            <select
+              value={selectedSessionId}
+              onChange={(e) => setSelectedSessionId(e.target.value)}
+              className="h-8 w-full rounded-md border border-neutral-300 bg-white px-3 text-xs text-neutral-900 shadow-sm focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+            >
+              <option value="">회차를 선택해주세요</option>
+              {sessions.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.title} ({s._count.applications}명)
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* 간단 검색 */}
-          <div className="flex items-center gap-2 text-xs">
+          <div className="w-full md:w-64">
             <input
               type="text"
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
               placeholder="이름, 학교, 희망대학 등 검색"
-              className="h-8 w-48 rounded-lg border border-transparent bg-transparent px-2 text-[11px] text-neutral-800 placeholder:text-neutral-400 transition hover:border-neutral-300 focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900/10"
+              className="h-8 w-full rounded-lg border border-neutral-300 bg-white px-2 text-[11px] text-neutral-800 placeholder:text-neutral-400 shadow-sm transition hover:border-neutral-400 focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900/10"
             />
           </div>
         </div>
-
-        {/* 회차 선택 */}
-        <section className="mb-6 rounded-xl border border-transparent bg-transparent px-4 py-4 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-100">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-neutral-800">
-                회차 선택
-              </label>
-              <select
-                value={selectedSessionId}
-                onChange={(e) => setSelectedSessionId(e.target.value)}
-                className="mt-2 h-10 w-full rounded-xl border border-transparent bg-transparent px-3 text-sm text-neutral-900 transition hover:border-neutral-300 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
-              >
-                <option value="">선택해주세요</option>
-                {sessions.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.title} ({s._count.applications}명)
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="text-xs text-neutral-500 md:text-right">
-              {sessionsLoading ? (
-                <p>회차 정보를 불러오는 중입니다...</p>
-              ) : selectedSession ? (
-                <>
-                  <p>
-                    평가일{" "}
-                    {new Date(selectedSession.date).toLocaleDateString("ko-KR")}
-                  </p>
-                  <p className="mt-0.5">
-                    신청 인원 {selectedSession._count.applications}명
-                  </p>
-                </>
-              ) : (
-                <p>상단에서 회차를 선택하면 신청 현황이 표시됩니다.</p>
-              )}
-            </div>
-          </div>
-        </section>
 
         {/* 통계 카드 (모든 보기에서 공통, 현재 필터 기준) */}
         <section className="mb-6 grid gap-3 md:grid-cols-4">
@@ -504,7 +481,7 @@ export default function AdminApplicationsPage() {
                     onChange={(e) =>
                       setEvalFilter(e.target.value as EvalFilter)
                     }
-                    className="h-7 rounded-lg border border-transparent bg-transparent px-2 transition hover:border-neutral-300 focus:border-neutral-900 focus:outline-none"
+                    className="h-7 rounded-lg border border-neutral-300 bg-white px-2 shadow-sm transition hover:border-neutral-400 focus:border-neutral-900 focus:outline-none"
                   >
                     <option value="ALL">전체</option>
                     <option value="EVALUATED">평가 완료</option>
@@ -517,7 +494,7 @@ export default function AdminApplicationsPage() {
                   <select
                     value={schoolFilter}
                     onChange={(e) => setSchoolFilter(e.target.value)}
-                    className="h-7 rounded-lg border border-transparent bg-transparent px-2 max-w-[140px] transition hover:border-neutral-300 focus:border-neutral-900 focus:outline-none"
+                    className="h-7 max-w-[140px] rounded-lg border border-neutral-300 bg-white px-2 shadow-sm transition hover:border-neutral-400 focus:border-neutral-900 focus:outline-none"
                   >
                     <option value="ALL">전체</option>
                     {schoolOptions.map((s) => (
@@ -533,7 +510,7 @@ export default function AdminApplicationsPage() {
                   <select
                     value={desiredUnivFilter}
                     onChange={(e) => setDesiredUnivFilter(e.target.value)}
-                    className="h-7 rounded-lg border border-transparent bg-transparent px-2 max-w-[160px] transition hover:border-neutral-300 focus:border-neutral-900 focus:outline-none"
+                    className="h-7 max-w-[160px] rounded-lg border border-neutral-300 bg-white px-2 shadow-sm transition hover:border-neutral-400 focus:border-neutral-900 focus:outline-none"
                   >
                     <option value="ALL">전체</option>
                     {desiredUnivOptions.map((u) => (
@@ -549,7 +526,7 @@ export default function AdminApplicationsPage() {
                   <select
                     value={sortKey}
                     onChange={(e) => setSortKey(e.target.value as SortKey)}
-                    className="h-7 rounded-lg border border-transparent bg-transparent px-2 transition hover:border-neutral-300 focus:border-neutral-900 focus:outline-none"
+                    className="h-7 rounded-lg border border-neutral-300 bg-white px-2 shadow-sm transition hover:border-neutral-400 focus:border-neutral-900 focus:outline-none"
                   >
                     <option value="CREATED_AT">신청일</option>
                     <option value="NAME">이름</option>
@@ -560,7 +537,7 @@ export default function AdminApplicationsPage() {
                     onClick={() =>
                       setSortOrder((prev) => (prev === "DESC" ? "ASC" : "DESC"))
                     }
-                    className="h-7 rounded-lg border border-transparent bg-transparent px-2 text-[10px] transition hover:border-neutral-300 hover:bg-neutral-100"
+                    className="h-7 rounded-lg border border-neutral-300 bg-white px-2 text-[10px] shadow-sm transition hover:border-neutral-400 hover:bg-neutral-50"
                   >
                     {sortOrder === "DESC" ? "내림차순" : "오름차순"}
                   </button>

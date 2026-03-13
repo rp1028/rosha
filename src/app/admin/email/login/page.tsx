@@ -121,37 +121,23 @@ export default function EmailLoginPage() {
   return (
     <div className="min-h-screen bg-white px-4 py-10">
       <div className="mx-auto w-full max-w-4xl">
-        <section className="mb-4 px-1">
-          <p className="text-sm font-medium text-neutral-900">
-            로그인 정보 재발송
-          </p>
-          <p className="mt-1 text-xs text-neutral-500">
-            재발송 시 비밀번호가 새로 생성되며, 기존 비밀번호는 더 이상 사용할 수 없습니다.
-          </p>
-        </section>
-
-        <section className="mb-6 rounded-xl border border-transparent bg-transparent px-4 py-4 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-100">
-          <label className="block text-[12px] font-medium text-neutral-800">
-            회차 선택
-          </label>
-          <div className="mt-2 w-full md:max-w-sm">
-            <Select
-              value={selectedSession}
-              onValueChange={(value) => setSelectedSession(value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="회차를 선택해주세요" />
-              </SelectTrigger>
-              <SelectContent>
-                {sessions.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
-                    {s.title} ({s._count.applications}명)
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </section>
+        <div className="mb-4 w-full md:max-w-sm">
+          <Select
+            value={selectedSession}
+            onValueChange={(value) => setSelectedSession(value)}
+          >
+            <SelectTrigger className="text-[11px]">
+              <SelectValue placeholder="회차를 선택해주세요" />
+            </SelectTrigger>
+            <SelectContent>
+              {sessions.map((s) => (
+                <SelectItem key={s.id} value={s.id}>
+                  {s.title} ({s._count.applications}명)
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
         {selectedSession && applications.length > 0 && (
           <>
