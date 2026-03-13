@@ -67,6 +67,15 @@ export default function Home() {
             학생 로그인
           </Link>
         </div>
+
+        <div className="mt-8">
+          <Link
+            href="/admin/login"
+            className="text-xs text-neutral-400 hover:text-neutral-600 transition underline underline-offset-4"
+          >
+            관리자 로그인
+          </Link>
+        </div>
       </div>
     </div>
   );
