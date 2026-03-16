@@ -273,7 +273,7 @@ export default function StudentLoginPage() {
         >
           <div className="space-y-2">
             <label className="block text-sm font-medium tracking-wide text-[#4d3b37]">
-              ID
+              아이디
             </label>
             <input
               type="text"
@@ -288,7 +288,7 @@ export default function StudentLoginPage() {
 
           <div className="space-y-2">
             <label className="block text-sm font-medium tracking-wide text-[#4d3b37]">
-              Password
+              비밀번호
             </label>
             <input
               type="password"
@@ -303,12 +303,12 @@ export default function StudentLoginPage() {
 
             <div className="mt-2 flex flex-col gap-2 text-[11px] text-[#9c8d83] sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <span>You don&apos;t have ID? </span>
+                <span>아이디가 없으신가요? </span>
                 <Link
                   href="/apply"
                   className="font-semibold text-[#5b4338] underline underline-offset-2"
                 >
-                  Apply
+                  신청하기
                 </Link>
               </div>
               <button
@@ -320,7 +320,7 @@ export default function StudentLoginPage() {
                 className="relative w-full text-left text-[#b3a59a] sm:w-auto sm:text-right hover:text-[#5b4338] transition"
               >
                 <span className="border-b border-[#d5c7bc] pb-px">
-                  Forget ID &amp; Password?
+                  아이디 · 비밀번호 찾기
                 </span>
               </button>
             </div>
@@ -338,7 +338,7 @@ export default function StudentLoginPage() {
               disabled={loading}
               className="mx-auto block h-11 w-full max-w-xl rounded-xl bg-[#3f302d] text-sm font-medium text-white transition hover:bg-[#332623] disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {loading ? "로그인 중..." : "Login"}
+              {loading ? "로그인 중..." : "로그인"}
             </button>
           </div>
         </form>

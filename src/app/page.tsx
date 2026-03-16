@@ -31,10 +31,10 @@ export default function Home() {
           }`}
         >
           <div className="flex flex-col items-center gap-3">
-            <h1 className="text-4xl sm:text-5xl font-semibold tracking-[0.18em] text-neutral-900">
+            <h1 className="text-5xl sm:text-6xl font-bold tracking-[0.08em] text-neutral-900">
               ROSHA 입시평가회
             </h1>
-            <p className="mt-2 text-base text-neutral-500">
+            <p className="mt-2 text-lg font-medium text-neutral-500">
               음악 입시평가회 온라인 시스템
             </p>
           </div>
@@ -46,10 +46,10 @@ export default function Home() {
           hideSplash ? "opacity-100" : "opacity-0"
         }`}
       >
-        <h1 className="text-3xl sm:text-4xl font-semibold tracking-[0.18em] text-neutral-900">
+        <h1 className="text-4xl sm:text-5xl font-bold tracking-[0.08em] text-neutral-900">
           ROSHA 입시평가회
         </h1>
-        <p className="mt-3 text-base text-neutral-500">
+        <p className="mt-3 text-lg font-medium text-neutral-500">
           음악 입시평가회 온라인 시스템
         </p>
 
